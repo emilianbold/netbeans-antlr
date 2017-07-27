@@ -1,0 +1,6 @@
+<!DOCTYPE fontscolors PUBLIC "-//NetBeans//DTD Editor Fonts and Colors settings 1.1//EN" "http://www.netbeans.org/dtds/EditorFontsColors-1_1.dtd">
+<fontscolors>
+    <fontcolor name="RULE" default="RULE" foreColor="blue" />
+    <fontcolor name="TOKENS" default="TOKENS" foreColor="red" />
+    <fontcolor name="COMMENT" default="COMMENT" foreColor="FF00aa00" />
+</fontscolors>

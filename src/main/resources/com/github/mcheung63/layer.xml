@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+	<folder name="Actions">
+		<folder name="Window">
+		</folder>
+	</folder>
+	<folder name="Editors">
+		<folder name="text">
+			<folder name="x-g4">
+				<attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.mcheung63.Bundle"/>
+				<file name="org-netbeans-modules-editor-NbEditorKit.instance"/>
+				<file name="language.instance">
+					<attr name="instanceCreate" methodvalue="com.github.mcheung63.syntax.RTokenId.getLanguage"/>
+					<attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
+				</file>
+				<folder name="FontsColors">
+					<folder name="NetBeans">
+						<folder name="Defaults">
+							<file name="FontAndColors.xml" url="syntax/FontAndColors.xml">
+								<attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.mcheung63.Bundle"/>
+							</file>
+						</folder>
+					</folder>
+				</folder>
+			</folder>
+		</folder>
+	</folder>
+</filesystem>
