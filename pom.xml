@@ -49,7 +49,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+					<sourceDirectory>${basedir}/src/main/java/com/github/mcheung63/syntax</sourceDirectory>
 					<grammars>ANTLRv4Parser.g4</grammars>
 					<includes>
 						<include>com/github/mcheung63/syntax/ANTLRv4Lexer.g4</include>
