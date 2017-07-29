@@ -38,7 +38,7 @@
 lexer grammar ANTLRv4Lexer;
 
 options
-   { superClass = LexerAdaptor; }
+   { superClass = com.github.mcheung63.syntax.antlr4.LexerAdaptor; }
 import LexBasic;
 // Standard set of fragments
 tokens

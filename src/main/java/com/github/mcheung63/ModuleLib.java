@@ -30,7 +30,7 @@ public class ModuleLib {
 
 	public static void log(String str) {
 		if (isDebug) {
-			InputOutput io = IOProvider.getDefault().getIO("Netbeans R", false);
+			InputOutput io = IOProvider.getDefault().getIO("Antlr", false);
 			io.getOut().println(sdf.format(new Date()) + " - " + str);
 		}
 	}

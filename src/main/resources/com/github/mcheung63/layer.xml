@@ -11,7 +11,7 @@
 				<attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.mcheung63.Bundle"/>
 				<file name="org-netbeans-modules-editor-NbEditorKit.instance"/>
 				<file name="language.instance">
-					<attr name="instanceCreate" methodvalue="com.github.mcheung63.syntax.RTokenId.getLanguage"/>
+					<attr name="instanceCreate" methodvalue="com.github.mcheung63.syntax.antlr4.Antlr4TokenId.getLanguage"/>
 					<attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
 				</file>
 				<folder name="FontsColors">
