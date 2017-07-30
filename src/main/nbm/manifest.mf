@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
+OpenIDE-Module-Layer: com/github/mcheung63/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/github/mcheung63/netbeans/antlr/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
 

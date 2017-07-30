@@ -49,7 +49,6 @@ public class Antlr4TokenId implements TokenId {
 	}
 
 	public static final Language<Antlr4TokenId> getLanguage() {
-		ModuleLib.log("getLanguage()");
 		return language;
 	}
 

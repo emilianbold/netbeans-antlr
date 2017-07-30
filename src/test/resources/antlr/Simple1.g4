@@ -1,4 +1,12 @@
-grammar Hello;
-r  : 'hello' ID ;
-ID : [a-z]+ ;
-WS : [ \r\t\n]+ -> skip ;
+grammar T;
+
+a
+    : 'b'   #alt1
+    | 'c'   #alt2
+    ;
+
+b : 'x' | 'y' {} ;
+
+e : e '*' e
+  | 'foo'
+  ;

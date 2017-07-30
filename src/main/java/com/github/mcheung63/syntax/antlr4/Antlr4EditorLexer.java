@@ -29,35 +29,21 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 
 	public Antlr4EditorLexer(LexerRestartInfo<Antlr4TokenId> info) {
 		this.info = info;
-		AntlrCharStream charStream = new AntlrCharStream(info.input(), "Antlr4Editor", true);
+		AntlrCharStream charStream = new AntlrCharStream(info.input(), "Antlr4Editor");
 		lexer = new ANTLRv4Lexer(charStream);
 	}
 
 	@Override
 	public Token<Antlr4TokenId> nextToken() {
 		org.antlr.v4.runtime.Token token = lexer.nextToken();
-		ModuleLib.log("nextToken(), token=" + token + ", " + token.getType() + ", " + token.getText());
+		ModuleLib.log("nextToken(), token=" + ANTLRv4Lexer.VOCABULARY.getSymbolicName(token.getType()) + "\t= " + token);
 		if (token.getType() != ANTLRv4Lexer.EOF) {
 			Antlr4TokenId tokenId = Antlr4LanguageHierarchy.getToken(token.getType());
+			ModuleLib.log("     tokenId" + tokenId);
+			ModuleLib.log("     info.tokenFactory().createToken(tokenId)=" + info.tokenFactory().createToken(tokenId));
 			return info.tokenFactory().createToken(tokenId);
 		}
-
-//		RTokenId tokenId = RLanguageHierarchy.getToken(RLexer.NL);
-//		ModuleLib.log("nextToken() shit=" + tokenId);
-//		return info.tokenFactory().createToken(tokenId);
 		return null;
-
-//		org.antlr.v4.runtime.Token token = lexer.nextToken();
-//		Token<RTokenId> createdToken = null;
-//
-//		if (token.getType() != -1) {
-//			RTokenId tokenId = RLanguageHierarchy.getToken(token.getType());
-//			createdToken = info.tokenFactory().createToken(tokenId);
-//		} else if (info.input().readLength() > 0) {
-//			RTokenId tokenId = RLanguageHierarchy.getToken(RLexer.WS);
-//			createdToken = info.tokenFactory().createToken(tokenId);
-//		}
-//		return createdToken;
 	}
 
 	@Override

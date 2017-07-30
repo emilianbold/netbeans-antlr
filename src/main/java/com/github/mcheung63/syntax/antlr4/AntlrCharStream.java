@@ -16,125 +16,99 @@
  */
 package com.github.mcheung63.syntax.antlr4;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.misc.Interval;
 import org.netbeans.spi.lexer.LexerInput;
 
 public class AntlrCharStream implements CharStream {
 
-	@Override
-	public String getText(Interval intrvl) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	private class CharStreamState {
-
-		int index;
-		int line;
-		int charPositionInLine;
-	}
-
-	private int line = 1;
-	private int charPositionInLine = 0;
-	private LexerInput input;
-	private String name;
+	private final LexerInput input;
+	private final String name;
 	private int index = 0;
-	private List<CharStreamState> markers;
 	private int markDepth = 0;
-	private int lastMarker;
 
-	private boolean ignoreCase = false;
-
-	public AntlrCharStream(LexerInput input, String name, boolean ignoreCase) {
+	public AntlrCharStream(LexerInput input, String name) {
 		this.input = input;
 		this.name = name;
-		this.ignoreCase = ignoreCase;
 	}
 
-	public String substring(int start, int stop) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+	@Override
+	public String getText(Interval interval) {
+		int start = interval.a;
+		int stop = interval.b;
 
-	public int LT(int i) {
-		return LA(i);
-	}
-
-	public int getLine() {
-		return line;
-	}
-
-	public void setLine(int line) {
-		this.line = line;
-	}
-
-	public void setCharPositionInLine(int pos) {
-		this.charPositionInLine = pos;
-	}
-
-	public int getCharPositionInLine() {
-		return charPositionInLine;
-	}
-
-	public void consume() {
-		int c = input.read();
-		index++;
-		charPositionInLine++;
-
-		if (c == '\n') {
-			line++;
-			charPositionInLine = 0;
-		}
-	}
-
-	public int LA(int i) {
-		if (i == 0) {
-			return 0; // undefined
+		if (start < 0 || stop < start) {
+			return "";
 		}
 
-		int c = 0;
-		for (int j = 0; j < i; j++) {
-			c = read();
-		}
-		backup(i);
-		return c;
-	}
+		final int pos = this.index;
+		final int length = interval.length();
+		final char[] data = new char[length];
 
-	public int mark() {
-		if (markers == null) {
-			markers = new ArrayList<CharStreamState>();
-			markers.add(null); // depth 0 means no backtracking, leave blank
+		seek(interval.a);
+		int r = 0;
+		while (r < length) {
+			final int character = read();
+			if (character == EOF) {
+				break;
+			}
+
+			data[r] = (char) character;
+			r++;
 		}
-		markDepth++;
-		CharStreamState state = null;
-		if (markDepth >= markers.size()) {
-			state = new CharStreamState();
-			markers.add(state);
+		seek(pos);
+
+		if (r > 0) {
+			return new String(data, 0, r);
 		} else {
-			state = (CharStreamState) markers.get(markDepth);
+			return "";
 		}
-		state.index = index;
-		state.line = line;
-		state.charPositionInLine = charPositionInLine;
-		lastMarker = markDepth;
-
-		return markDepth;
 	}
 
-	public void rewind() {
-		rewind(lastMarker);
+	@Override
+	public void consume() {
+		int character = read();
+		if (character == EOF) {
+			backup(1);
+			throw new IllegalStateException("Attempting to consume EOF");
+		}
 	}
 
-	public void rewind(int marker) {
-		CharStreamState state = (CharStreamState) markers.get(marker);
-		// restore stream state
-		seek(state.index);
-		line = state.line;
-		charPositionInLine = state.charPositionInLine;
-		release(marker);
+	@Override
+	public int LA(int lookaheadAmount) {
+		if (lookaheadAmount < 0) {
+			return lookBack(-lookaheadAmount);
+		} else if (lookaheadAmount > 0) {
+			return lookAhead(lookaheadAmount);
+		} else {
+			return 0; //Behaviour is undefined when lookaheadAmount == 0
+		}
 	}
 
+	private int lookBack(int amount) {
+		backup(amount);
+		int character = read();
+		for (int i = 1; i < amount; i++) {
+			read();
+		}
+		return character;
+	}
+
+	private int lookAhead(int amount) {
+		int character = 0;
+		for (int i = 0; i < amount; i++) {
+			character = read();
+		}
+		backup(amount);
+		return character;
+	}
+
+	@Override
+	public int mark() {
+		return ++markDepth;
+	}
+
+	@Override
 	public void release(int marker) {
 		// unwind any other markers made after m and release m
 		markDepth = marker;
@@ -142,10 +116,14 @@ public class AntlrCharStream implements CharStream {
 		markDepth--;
 	}
 
+	@Override
 	public void seek(int index) {
+		if (index < 0) {
+			throw new IllegalArgumentException(String.format("Invalid index (%s < 0)", index));
+		}
+
 		if (index < this.index) {
 			backup(this.index - index);
-			this.index = index; // just jump; don't update stream state (line, ...)
 			return;
 		}
 
@@ -155,28 +133,34 @@ public class AntlrCharStream implements CharStream {
 		}
 	}
 
+	@Override
 	public int index() {
 		return index;
 	}
 
+	@Override
 	public int size() {
 		return -1; //unknown...
 	}
 
+	@Override
 	public String getSourceName() {
 		return name;
 	}
 
 	private int read() {
 		int result = input.read();
-		if (result == LexerInput.EOF) {
-			result = CharStream.EOF;
-		}
+		index++;
 
-		return result;
+		if (result == LexerInput.EOF) {
+			return EOF;
+		} else {
+			return result;
+		}
 	}
 
 	private void backup(int count) {
 		input.backup(count);
+		index -= count;
 	}
 }
