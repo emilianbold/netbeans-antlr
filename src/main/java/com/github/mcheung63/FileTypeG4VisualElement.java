@@ -7,23 +7,24 @@ package com.github.mcheung63;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.io.FileUtils;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.snt.inmemantlr.GenericParser;
 import org.snt.inmemantlr.listener.DefaultTreeListener;
 import org.snt.inmemantlr.tree.Ast;
-import org.snt.inmemantlr.utils.FileUtils;
 
 @MultiViewElement.Registration(
 		displayName = "#LBL_FileTypeG4_VISUAL",
@@ -60,10 +61,9 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         jTabbedPane1 = new javax.swing.JTabbedPane();
         treePanel = new javax.swing.JPanel();
         refreshTreeButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        grammarTextField = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        ruleTextField = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        contentTextArea = new javax.swing.JTextArea();
+        browseTestFileButton = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -74,14 +74,17 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel1.text")); // NOI18N
+        contentTextArea.setColumns(20);
+        contentTextArea.setRows(5);
+        jScrollPane1.setViewportView(contentTextArea);
 
-        grammarTextField.setText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.grammarTextField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel2.text")); // NOI18N
-        jLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel2.toolTipText")); // NOI18N
-
-        ruleTextField.setText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.ruleTextField.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(browseTestFileButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.browseTestFileButton.text")); // NOI18N
+        browseTestFileButton.setToolTipText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.browseTestFileButton.toolTipText")); // NOI18N
+        browseTestFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                browseTestFileButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout treePanelLayout = new javax.swing.GroupLayout(treePanel);
         treePanel.setLayout(treePanelLayout);
@@ -89,16 +92,14 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
             treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(treePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(refreshTreeButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(grammarTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ruleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(244, Short.MAX_VALUE))
+                .addGroup(treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(treePanelLayout.createSequentialGroup()
+                        .addComponent(browseTestFileButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(refreshTreeButton)
+                        .addGap(0, 466, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         treePanelLayout.setVerticalGroup(
             treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -106,11 +107,10 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
                 .addContainerGap()
                 .addGroup(treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshTreeButton)
-                    .addComponent(jLabel1)
-                    .addComponent(grammarTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(ruleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(714, Short.MAX_VALUE))
+                    .addComponent(browseTestFileButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.treePanel.TabConstraints.tabTitle"), treePanel); // NOI18N
@@ -119,7 +119,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
     }// </editor-fold>//GEN-END:initComponents
 
     private void refreshTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTreeButtonActionPerformed
-		String base = "/Users/peter/Desktop";
+		/*String base = "/Users/peter/Desktop";
 		new File(base + "/temp").delete();
 		new File(base + "/temp").mkdir();
 		File file = new File(obj.getPrimaryFile().getPath());
@@ -144,17 +144,49 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 			ModuleLib.log(ast.toDot());
 		} catch (Exception ex) {
 			ModuleLib.log("exception=" + ModuleLib.printException(ex));
+		}*/
+
+		try {
+			File file = new File(obj.getPrimaryFile().getPath());
+//			System.out.println(Paths.get(getClass().getResource("Calculator.g4").toURI()));
+//			String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
+			GenericParser gp = new GenericParser(file);
+			DefaultTreeListener treeListener = new DefaultTreeListener();
+			gp.setListener(treeListener);
+			gp.compile();
+			ParserRuleContext ctx = gp.parse("1+2*(3+4)");
+			Ast ast = treeListener.getAst();
+//			List<AstNode> nodes = ast.getNodes();
+//			for (AstNode n : nodes) {
+//				loop("", n);
+//			}
+			System.out.println(ast.toDot());
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
     }//GEN-LAST:event_refreshTreeButtonActionPerformed
 
+    private void browseTestFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseTestFileButtonActionPerformed
+		final JFileChooser fc = new JFileChooser();
+		int returnVal = fc.showOpenDialog(null);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+			try {
+				contentTextArea.setText(FileUtils.readFileToString(file, "UTF-8"));
+			} catch (IOException ex) {
+				Exceptions.printStackTrace(ex);
+			}
+		}
+    }//GEN-LAST:event_browseTestFileButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField grammarTextField;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton browseTestFileButton;
+    private javax.swing.JTextArea contentTextArea;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton refreshTreeButton;
-    private javax.swing.JTextField ruleTextField;
     private javax.swing.JPanel treePanel;
     // End of variables declaration//GEN-END:variables
 
