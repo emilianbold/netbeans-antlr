@@ -33,15 +33,6 @@ public class Antlr4LanguageHierarchy extends LanguageHierarchy<Antlr4TokenId> {
 	private static Map<Integer, Antlr4TokenId> idToToken = new HashMap<Integer, Antlr4TokenId>();
 
 	static {
-//		ModuleLib.log("RLanguageHierarchy static");
-//		AntlrTokenReader reader = new AntlrTokenReader();
-//		tokens = reader.readTokenFile();
-//		idToToken = new HashMap<Integer, RTokenId>();
-//		for (RTokenId token : tokens) {
-//			idToToken.put(token.ordinal(), token);
-//		}
-//		ModuleLib.log("Antlr4LanguageHierarchy");
-
 		for (int x = 0; x <= ANTLRv4Lexer.VOCABULARY.getMaxTokenType(); x++) {
 			String name = ANTLRv4Lexer.VOCABULARY.getSymbolicName(x);
 			if (name == null) {
@@ -52,14 +43,6 @@ public class Antlr4LanguageHierarchy extends LanguageHierarchy<Antlr4TokenId> {
 			idToToken.put(x, token);
 			tokens.add(token);
 		}
-//		int x = 0;
-//		for (String ruleName : ANTLRv4Lexer.tokenNames) {
-//			ModuleLib.log("RLanguageHierarchy static, " + x + " = " + ruleName);
-//			Antlr4TokenId token = new Antlr4TokenId(ruleName, ruleName, x);
-//			idToToken.put(x, token);
-//			tokens.add(token);
-//			x++;
-//		}
 	}
 
 	public static synchronized Antlr4TokenId getToken(int id) {
