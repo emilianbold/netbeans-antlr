@@ -16,7 +16,6 @@
  */
 package com.github.mcheung63.syntax.antlr4;
 
-import com.github.mcheung63.ModuleLib;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.TokenId;
 

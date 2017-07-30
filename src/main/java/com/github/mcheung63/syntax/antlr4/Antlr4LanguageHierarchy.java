@@ -16,7 +16,6 @@
  */
 package com.github.mcheung63.syntax.antlr4;
 
-import com.github.mcheung63.ModuleLib;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class Antlr4LanguageHierarchy extends LanguageHierarchy<Antlr4TokenId> {
 			if (name == null) {
 				name = "<INVALID>";
 			}
-			ModuleLib.log("RLanguageHierarchy static, " + x + " = " + name);
+			//ModuleLib.log("RLanguageHierarchy static, " + x + " = " + name);
 			Antlr4TokenId token = new Antlr4TokenId(name, name, x);
 			idToToken.put(x, token);
 			tokens.add(token);

@@ -1,5 +1,20 @@
 <!DOCTYPE fontscolors PUBLIC "-//NetBeans//DTD Editor Fonts and Colors settings 1.1//EN" "http://www.netbeans.org/dtds/EditorFontsColors-1_1.dtd">
 <fontscolors>
     <fontcolor name="GRAMMAR" default="GRAMMAR" foreColor="red" />
+	
+    <fontcolor name="LINE_COMMENT" default="LINE_COMMENT" foreColor="ff969696" />
+	<fontcolor name="BLOCK_COMMENT" default="BLOCK_COMMENT" foreColor="ff969696" />
+	<fontcolor name="DOC_COMMENT" default="DOC_COMMENT" foreColor="ff969696" />
+	
     <fontcolor name="TOKEN_REF" default="TOKEN_REF" foreColor="blue" />
+    <fontcolor name="RULE_REF" default="RULE_REF" foreColor="blue" />
+    <fontcolor name="LEXER" default="LEXER" foreColor="blue" />
+	
+	
+    <fontcolor name="FRAGMENT" default="FRAGMENT" foreColor="ff0019af" />
+	
+	
+	<fontcolor name="STRING_LITERAL" default="STRING_LITERAL" foreColor="ffff8400" />
+	
+	
 </fontscolors>

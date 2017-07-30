@@ -36,11 +36,11 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 	@Override
 	public Token<Antlr4TokenId> nextToken() {
 		org.antlr.v4.runtime.Token token = lexer.nextToken();
-		ModuleLib.log("nextToken(), token=" + ANTLRv4Lexer.VOCABULARY.getSymbolicName(token.getType()) + "\t= " + token);
+		//ModuleLib.log("nextToken(), token=" + ANTLRv4Lexer.VOCABULARY.getSymbolicName(token.getType()) + "\t= " + token);
 		if (token.getType() != ANTLRv4Lexer.EOF) {
 			Antlr4TokenId tokenId = Antlr4LanguageHierarchy.getToken(token.getType());
-			ModuleLib.log("     tokenId" + tokenId);
-			ModuleLib.log("     info.tokenFactory().createToken(tokenId)=" + info.tokenFactory().createToken(tokenId));
+//			ModuleLib.log("     tokenId" + tokenId);
+//			ModuleLib.log("     info.tokenFactory().createToken(tokenId)=" + info.tokenFactory().createToken(tokenId));
 			return info.tokenFactory().createToken(tokenId);
 		}
 		return null;
