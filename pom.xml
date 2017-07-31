@@ -147,11 +147,11 @@
 			<artifactId>org-netbeans-modules-lexer</artifactId>
 			<version>RELEASE82</version>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>org.netbeans.api</groupId>
 			<artifactId>org-netbeans-libs-antlr4-runtime</artifactId>
 			<version>RELEASE82</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.netbeans.api</groupId>
 			<artifactId>org-netbeans-api-io</artifactId>
