@@ -76,6 +76,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 
         contentTextArea.setColumns(20);
         contentTextArea.setRows(5);
+        contentTextArea.setText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.contentTextArea.text")); // NOI18N
         jScrollPane1.setViewportView(contentTextArea);
 
         org.openide.awt.Mnemonics.setLocalizedText(browseTestFileButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.browseTestFileButton.text")); // NOI18N
@@ -148,13 +149,14 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 
 		try {
 			File file = new File(obj.getPrimaryFile().getPath());
+			ModuleLib.log(file.getAbsolutePath());
 //			System.out.println(Paths.get(getClass().getResource("Calculator.g4").toURI()));
 //			String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
 			GenericParser gp = new GenericParser(file);
 			DefaultTreeListener treeListener = new DefaultTreeListener();
 			gp.setListener(treeListener);
 			gp.compile();
-			ParserRuleContext ctx = gp.parse("1+2*(3+4)");
+			ParserRuleContext ctx = gp.parse(contentTextArea.getText());
 			Ast ast = treeListener.getAst();
 //			List<AstNode> nodes = ast.getNodes();
 //			for (AstNode n : nodes) {
@@ -177,6 +179,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 			} catch (IOException ex) {
 				Exceptions.printStackTrace(ex);
 			}
+			refreshTreeButtonActionPerformed(null);
 		}
     }//GEN-LAST:event_browseTestFileButtonActionPerformed
 
