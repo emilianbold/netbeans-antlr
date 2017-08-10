@@ -7,12 +7,32 @@ package com.github.mcheung63;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import javax.print.PrintException;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import static org.antlr.v4.gui.TestRig.LEXER_START_RULE_NAME;
+import org.antlr.v4.gui.Trees;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.apache.commons.io.FileUtils;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
@@ -22,9 +42,6 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-import org.snt.inmemantlr.GenericParser;
-import org.snt.inmemantlr.listener.DefaultTreeListener;
-import org.snt.inmemantlr.tree.Ast;
 
 @MultiViewElement.Registration(
 		displayName = "#LBL_FileTypeG4_VISUAL",
@@ -40,6 +57,15 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 	private FileTypeG4DataObject obj;
 	private JToolBar toolbar = new JToolBar();
 	private transient MultiViewElementCallback callback;
+	String startRuleName;
+	String grammarName;
+	boolean showTokens = true;
+	boolean diagnostics = true;
+	boolean gui = true;
+	boolean SLL = true;
+	boolean trace = true;
+	boolean printTree = true;
+	String psFile = null;
 
 	public FileTypeG4VisualElement(Lookup lkp) {
 		obj = lkp.lookup(FileTypeG4DataObject.class);
@@ -64,6 +90,8 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         jScrollPane1 = new javax.swing.JScrollPane();
         contentTextArea = new javax.swing.JTextArea();
         browseTestFileButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        startRuleTextField = new javax.swing.JTextField();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -87,6 +115,10 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel1.text")); // NOI18N
+
+        startRuleTextField.setText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.startRuleTextField.text")); // NOI18N
+
         javax.swing.GroupLayout treePanelLayout = new javax.swing.GroupLayout(treePanel);
         treePanel.setLayout(treePanelLayout);
         treePanelLayout.setHorizontalGroup(
@@ -99,7 +131,11 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
                         .addComponent(browseTestFileButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(refreshTreeButton)
-                        .addGap(0, 466, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(startRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 347, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         treePanelLayout.setVerticalGroup(
@@ -108,7 +144,9 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
                 .addContainerGap()
                 .addGroup(treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshTreeButton)
-                    .addComponent(browseTestFileButton))
+                    .addComponent(browseTestFileButton)
+                    .addComponent(jLabel1)
+                    .addComponent(startRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
                 .addContainerGap())
@@ -147,27 +185,132 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 			ModuleLib.log("exception=" + ModuleLib.printException(ex));
 		}*/
 
-		try {
-			File file = new File(obj.getPrimaryFile().getPath());
-			ModuleLib.log(file.getAbsolutePath());
-//			System.out.println(Paths.get(getClass().getResource("Calculator.g4").toURI()));
-//			String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
-			GenericParser gp = new GenericParser(file);
-			DefaultTreeListener treeListener = new DefaultTreeListener();
-			gp.setListener(treeListener);
-			gp.compile();
-			ParserRuleContext ctx = gp.parse(contentTextArea.getText());
-			Ast ast = treeListener.getAst();
+//		try {
+//			File file = new File(obj.getPrimaryFile().getPath());
+//			ModuleLib.log(file.getAbsolutePath());
+////			System.out.println(Paths.get(getClass().getResource("Calculator.g4").toURI()));
+////			String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
+//			GenericParser gp = new GenericParser(file);
+//			DefaultTreeListener treeListener = new DefaultTreeListener();
+//			gp.setListener(treeListener);
+//			gp.compile();
+//			ParserRuleContext ctx = gp.parse(contentTextArea.getText());
+//			Ast ast = treeListener.getAst();
 //			List<AstNode> nodes = ast.getNodes();
 //			for (AstNode n : nodes) {
-//				loop("", n);
+//				ModuleLib.log(n);
+//				//loop("", n);
 //			}
-			System.out.println(ast.toDot());
+//			System.out.println(ast.toDot());
+//		} catch (Exception ex) {
+//			ModuleLib.log(ex.getMessage());
+//		}
+		try {
+			File file = new File(obj.getPrimaryFile().getPath());
+			startRuleName = startRuleTextField.getText();
+			grammarName = file.getName();
+			String lexerName = grammarName + "Lexer";
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			Class<? extends Lexer> lexerClass = null;
+			try {
+				lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+			} catch (java.lang.ClassNotFoundException cnfe) {
+				// might be pure lexer grammar; no Lexer suffix then
+				lexerName = grammarName;
+				try {
+					lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
+				} catch (ClassNotFoundException cnfe2) {
+					ModuleLib.log("Can't load " + lexerName + " as lexer or parser");
+					return;
+				}
+			}
+
+			Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
+			Lexer lexer = lexerCtor.newInstance((CharStream) null);
+
+			Class<? extends Parser> parserClass = null;
+			Parser parser = null;
+			if (!startRuleName.equals(LEXER_START_RULE_NAME)) {
+				String parserName = grammarName + "Parser";
+				parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
+				Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
+				parser = parserCtor.newInstance((TokenStream) null);
+			}
+
+			String encoding = "UTF-8";
+			Charset charset = (encoding == null ? Charset.defaultCharset() : Charset.forName(encoding));
+			List<String> inputFiles = new ArrayList<String>();
+			if (inputFiles.size() == 0) {
+				CharStream charStream = CharStreams.fromStream(System.in, charset);
+				process(lexer, parserClass, parser, charStream);
+				return;
+			}
+			for (String inputFile : inputFiles) {
+				CharStream charStream = CharStreams.fromPath(Paths.get(inputFile), charset);
+				if (inputFiles.size() > 1) {
+					System.err.println(inputFile);
+				}
+				process(lexer, parserClass, parser, charStream);
+			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			ModuleLib.log(ex.getMessage());
 		}
     }//GEN-LAST:event_refreshTreeButtonActionPerformed
 
+	void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, CharStream input) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
+		lexer.setInputStream(input);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+		tokens.fill();
+
+		if (showTokens) {
+			for (Token tok : tokens.getTokens()) {
+				if (tok instanceof CommonToken) {
+					System.out.println(((CommonToken) tok).toString(lexer));
+				} else {
+					System.out.println(tok.toString());
+				}
+			}
+		}
+
+		if (startRuleName.equals(LEXER_START_RULE_NAME)) {
+			return;
+		}
+
+		if (diagnostics) {
+			parser.addErrorListener(new DiagnosticErrorListener());
+			parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
+		}
+
+		//if (printTree || gui || psFile != null) {
+		if (gui) {
+			parser.setBuildParseTree(true);
+		}
+
+		if (SLL) { // overrides diagnostics
+			parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+		}
+
+		parser.setTokenStream(tokens);
+		parser.setTrace(trace);
+
+		try {
+			Method startRule = parserClass.getMethod(startRuleName);
+			ParserRuleContext tree = (ParserRuleContext) startRule.invoke(parser, (Object[]) null);
+
+			if (printTree) {
+				System.out.println(tree.toStringTree(parser));
+			}
+			if (gui) {
+				Trees.inspect(tree, parser);
+			}
+			if (psFile != null) {
+				Trees.save(tree, parser, psFile); // Generate postscript
+			}
+		} catch (NoSuchMethodException nsme) {
+			System.err.println("No method for rule " + startRuleName + " or it has arguments");
+		}
+	}
     private void browseTestFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseTestFileButtonActionPerformed
 		final JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showOpenDialog(null);
@@ -187,9 +330,11 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseTestFileButton;
     private javax.swing.JTextArea contentTextArea;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton refreshTreeButton;
+    private javax.swing.JTextField startRuleTextField;
     private javax.swing.JPanel treePanel;
     // End of variables declaration//GEN-END:variables
 
