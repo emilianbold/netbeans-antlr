@@ -176,10 +176,12 @@
 			<version>1.3.8</version>
 			<type>jar</type>
 		</dependency>
-<!--		<dependency>
+		<!--
+		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
 			<version>4.7</version>
-		</dependency>-->
+		</dependency>
+		-->
 	</dependencies>
 </project>
