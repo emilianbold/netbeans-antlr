@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -202,6 +203,8 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 //		}
 		try {
 			File file = new File(obj.getPrimaryFile().getPath());
+			File tempDir = Files.createTempDir();
+			
 			startRuleName = startRuleTextField.getText();
 			grammarName = file.getName();
 			String lexerName = grammarName + "Lexer";
