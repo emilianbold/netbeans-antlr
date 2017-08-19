@@ -150,8 +150,8 @@ public class AstNode {
 
 	@Override
 	public String toString() {
-		//return "id=" + id + ", type=" + ntype + ", label=" + label;
-		return label;
+		return "id=" + id + ", type=" + ntype + ", label=" + label;
+		//return label;
 	}
 
 	public boolean isLeaf() {
