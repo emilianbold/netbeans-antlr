@@ -1,4 +1,4 @@
-grammar T;
+grammar Simple1;
 
 a
     : 'b'   #alt1
