@@ -6,25 +6,14 @@
 package com.github.mcheung63;
 
 import com.peterswing.CommonLib;
-import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.Style;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.MutableGraph;
-import guru.nidi.graphviz.parse.Parser;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import javax.swing.ImageIcon;
-import org.antlr.parser.antlr4.ANTLRv4Lexer;
-import org.antlr.parser.antlr4.ANTLRv4Parser;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.netbeans.api.actions.Openable;
+import java.util.Collection;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
@@ -53,13 +42,17 @@ import org.openide.util.Utilities;
 	"CTL_TreeTopComponent=Tree Window",
 	"HINT_TreeTopComponent=This is a Tree window"
 })
-public final class TreeTopComponent extends TopComponent {
+public final class TreeTopComponent extends TopComponent implements LookupListener {
+
+	Lookup.Result<DataObject> result;
 
 	public TreeTopComponent() {
 		initComponents();
 		setName(Bundle.CTL_TreeTopComponent());
 		setToolTipText(Bundle.HINT_TreeTopComponent());
 
+		result = Utilities.actionsGlobalContext().lookupResult(DataObject.class);
+		result.addLookupListener(this);
 	}
 
 	/**
@@ -113,11 +106,21 @@ public final class TreeTopComponent extends TopComponent {
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
 		try {
 
-			Lookup.Result<Openable> lookupResults = Utilities.actionsGlobalContext().lookupResult(Openable.class);
-			for (Openable o : lookupResults.allInstances()) {
-				ModuleLib.log("o=" + o);
-			}
-			
+//			Lookup.Result<Openable> lookupResults = Utilities.actionsGlobalContext().lookupResult(Openable.class);
+//			for (Openable o : lookupResults.allInstances()) {
+//				ModuleLib.log("o=" + o);
+//			}
+//			Lookup.Result<FileObject> result = Utilities.actionsGlobalContext().lookupResult(FileObject.class);
+//			Lookup.Result<DataObject> result = Lookup.getDefault().lookupAll(DataObject.class);
+//			Collection<? extends FileObject> c = Lookup.getDefault().lookupAll(FileObject.class);
+//			ModuleLib.log("c2=" + result.allInstances());
+//			for (FileObject o : result.allInstances()) {
+//				ModuleLib.log("o=" + o);
+//			}
+			DataObject DataObject = Utilities.actionsGlobalContext().lookup(DataObject.class);
+			ModuleLib.log("DataObject=" + DataObject);
+
+			/*
 			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(getClass().getResourceAsStream("simple1.g4")));
 
 //		Token token = lexer.nextToken();
@@ -171,6 +174,7 @@ public final class TreeTopComponent extends TopComponent {
 
 			BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
 			graphvizLabel.setIcon(new ImageIcon(image));
+			 */
 		} catch (Exception ex) {
 			ModuleLib.log(CommonLib.printException(ex));
 		}
@@ -213,5 +217,14 @@ public final class TreeTopComponent extends TopComponent {
 	void readProperties(java.util.Properties p) {
 		String version = p.getProperty("version");
 		// TODO read your settings according to their version
+	}
+
+	@Override
+	public void resultChanged(LookupEvent le) {
+		Collection<? extends DataObject> shits = result.allInstances();
+		for (DataObject d : shits) {
+			ModuleLib.log("resultChanged=" + d);
+		}
+		ModuleLib.log("-------------");
 	}
 }
