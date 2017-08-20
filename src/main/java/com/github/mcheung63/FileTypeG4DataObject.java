@@ -23,7 +23,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
 @Messages({
-    "LBL_FileTypeG4_LOADER=Files of FileTypeG4"
+    "LBL_FileTypeG4_LOADER=Files of FileType G4"
 })
 @MIMEResolver.ExtensionRegistration(
     displayName="#LBL_FileTypeG4_LOADER",

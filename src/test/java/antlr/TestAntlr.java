@@ -77,7 +77,7 @@ public class TestAntlr {
 		
 		
 		BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
-		new JFrameWin(image).setVisible(true);
+//		new JFrameWin(image).setVisible(true);
 //		Graphviz.fromGraph(g).width(700).render(Format.PNG).toFile(new File("example/ex4-2.png"));
 	}
 
