@@ -175,6 +175,11 @@
 			<artifactId>graphviz-java</artifactId>
 			<version>0.2.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.mcheung63</groupId>
+			<artifactId>peter-swing</artifactId>
+			<version>20160618</version>
+		</dependency>
 		
 		<!--		<dependency>
 			<groupId>com.github.julianthome</groupId>
