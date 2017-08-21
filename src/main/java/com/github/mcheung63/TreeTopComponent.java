@@ -6,7 +6,21 @@
 package com.github.mcheung63;
 
 import com.peterswing.CommonLib;
+import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Style;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.parse.Parser;
+import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.List;
+import javax.swing.ImageIcon;
+import org.antlr.parser.antlr4.ANTLRv4Lexer;
+import org.antlr.parser.antlr4.ANTLRv4Parser;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -45,6 +59,7 @@ import org.openide.util.Utilities;
 public final class TreeTopComponent extends TopComponent implements LookupListener {
 
 	Lookup.Result<DataObject> result;
+	DataObject lastDataObject;
 
 	public TreeTopComponent() {
 		initComponents();
@@ -120,8 +135,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 			DataObject DataObject = Utilities.actionsGlobalContext().lookup(DataObject.class);
 			ModuleLib.log("DataObject=" + DataObject);
 
-			/*
-			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(getClass().getResourceAsStream("simple1.g4")));
+			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().asText()));
 
 //		Token token = lexer.nextToken();
 //		while (token.getType() != Lexer.EOF) {
@@ -174,7 +188,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
 			BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
 			graphvizLabel.setIcon(new ImageIcon(image));
-			 */
+
 		} catch (Exception ex) {
 			ModuleLib.log(CommonLib.printException(ex));
 		}
@@ -224,6 +238,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 		Collection<? extends DataObject> shits = result.allInstances();
 		for (DataObject d : shits) {
 			ModuleLib.log("resultChanged=" + d);
+			lastDataObject = d;
 		}
 		ModuleLib.log("-------------");
 	}
