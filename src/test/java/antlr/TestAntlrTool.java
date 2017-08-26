@@ -48,15 +48,19 @@ public class TestAntlrTool {
 				return;
 			}
 
-			System.out.println(ast.toStringTree());
-			Grammar g = tool.createGrammar(ast);
-			tool.process(g, false);
-			System.out.println("g=" + g);
+			System.out.println("ast.toStringTree()=" + ast.toStringTree());
+			Grammar grammar = tool.createGrammar(ast);
+			tool.process(grammar, false);
+			System.out.println("grammar=" + grammar);
 			System.out.println("tool=" + tool);
-			for (int x = 0; x < ast.getChildCount(); x++) {
-				printAST(ast.getChild(x));
+
+			for (String rule : grammar.getRuleNames()) {
+				System.out.println("rule=" + rule);
 			}
-			LexerInterpreter lex = g.createLexerInterpreter(new ANTLRInputStream(";comment1"));
+
+			processAST(ast);
+
+			LexerInterpreter lex = grammar.createLexerInterpreter(new ANTLRInputStream(";comment1"));
 			for (Token token : lex.getAllTokens()) {
 				System.out.println("token=" + token);
 			}
@@ -72,12 +76,12 @@ public class TestAntlrTool {
 			};
 
 			CommonTokenStream tokenStream = new CommonTokenStream(lex);
-			ParserInterpreter parser = g.createParserInterpreter(tokenStream);
+			ParserInterpreter parser = grammar.createParserInterpreter(tokenStream);
 			parser.getInterpreter().setPredictionMode(PredictionMode.LL);
 			parser.removeErrorListeners();
 			parser.addErrorListener(printError);
 			String startRule = "assemble";
-			Rule start = g.getRule(startRule);
+			Rule start = grammar.getRule(startRule);
 			ParserRuleContext parserRuleContext = parser.parse(start.index);
 			System.out.println("parserRuleContext=" + parserRuleContext);
 			while (parserRuleContext.getParent() != null) {
@@ -92,12 +96,19 @@ public class TestAntlrTool {
 	}
 
 	private void printAST(Tree child, String prefix) {
-		System.out.println(prefix + "-" + child);
-		prefix += "  ";
-		if (child.getChildCount() > 0) {
-			for (int x = 0; x < child.getChildCount(); x++) {
-				printAST(child.getChild(x), prefix);
-			}
+		if (child.getText().equals("BLOCK")) {
+			prefix += " --- ";
+		}
+		System.out.println(prefix + "-" + child.getText());
+		prefix += " --- ";
+		for (int x = 0; x < child.getChildCount(); x++) {
+			printAST(child.getChild(x), prefix);
+		}
+	}
+
+	private void processAST(GrammarRootAST ast) {
+		for (int x = 0; x < ast.getChildCount(); x++) {
+			printAST(ast.getChild(x));
 		}
 	}
 }

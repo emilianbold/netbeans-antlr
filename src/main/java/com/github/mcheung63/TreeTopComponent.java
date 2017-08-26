@@ -7,9 +7,28 @@ package com.github.mcheung63;
 
 import com.peterswing.CommonLib;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.Tool;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.LexerInterpreter;
+import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.GrammarASTErrorNode;
+import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -114,116 +133,79 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
 		try {
-			ModuleLib.log("getClass().getResource(\"/test/Calculator.g4\")=" + getClass().getResource("/test/Calculator.g4"));
-			String content = IOUtils.toString(getClass().getResourceAsStream("/test/Calculator.g4"), "UTF-8");
-			//String content = FileUtils.readFileToString(new File("/Users/peter/NetBeansProjects/netbeans-antlr/src/test/resources/antlr/Calculator.g4"), "UTF-8");
-			GenericParser gp = new GenericParser(content);
-			DefaultTreeListener treeListener = new DefaultTreeListener();
-			gp.setListener(treeListener);
-			gp.compile();
+			Tool tool = new Tool();
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			System.out.println("getClass().getResource(\"/test/Assembler.g4\")=" + classLoader.getResource("../../../test/Assembler.g4"));
+			System.out.println("getClass().getResource(\"/test/Assembler.g4\")=" + classLoader.getResource("../../test/Assembler.g4"));
+			System.out.println("getClass().getResource(\"/test/Assembler.g4\")=" + classLoader.getResource("../test/Assembler.g4"));
+			String content = IOUtils.toString(classLoader.getResourceAsStream("/test/Assembler.g4"), "UTF-8");
+			GrammarRootAST ast = tool.parseGrammarFromString(content);
+			System.out.println("ast.grammarType=" + ast.grammarType);
+			if (ast.grammarType == ANTLRParser.COMBINED) {
+				System.out.println("ast=" + ast);
+				if ((GrammarAST) ast instanceof GrammarASTErrorNode) {
+					System.out.println("GrammarASTErrorNode");
+					return;
+				}
 
-//			MemoryTupleSet set = gp.getAllCompiledObjects();
-//			for (MemoryTuple tup : set) {
-//				System.out.println("tuple name " + tup.getClassName());
-//				System.out.println("source " + tup.getSource().getClassName());
-//				for (MemoryByteCode mc : tup.getByteCodeObjects()) {
-//					Objects.requireNonNull(mc, "MemoryByteCode must not be null");
-//					System.out.println("bc name: " + mc.getClassName());
-//
-//					if (!mc.isInnerClass()) {
-//						mc.getClassName().equals(tup.getSource().getClassName());
-//					} else {
-//						mc.getClassName().startsWith(tup.getSource().getClassName());
-//					}
-//				}
-//			}
-			ParserRuleContext ctx = gp.parse("1+2*(3+4)");
-			Ast ast = treeListener.getAst();
-			List<AstNode> nodes = ast.getNodes();
-			for (AstNode n : nodes) {
-				loop("", n);
+				if (ast.hasErrors) {
+					System.out.println("hasErrors");
+					return;
+				}
+
+				System.out.println(ast.toStringTree());
+				Grammar g = tool.createGrammar(ast);
+				tool.process(g, false);
+				System.out.println("g=" + g);
+				System.out.println("tool=" + tool);
+				for (int x = 0; x < ast.getChildCount(); x++) {
+					printAST(ast.getChild(x));
+				}
+				LexerInterpreter lex = g.createLexerInterpreter(new ANTLRInputStream(";comment1"));
+				for (Token token : lex.getAllTokens()) {
+					System.out.println("token=" + token);
+				}
+				lex.reset();
+
+				BaseErrorListener printError = new BaseErrorListener() {
+					@Override
+					public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol,
+							final int line, final int position, final String msg,
+							final RecognitionException e) {
+						System.out.println(line + ":" + position + ": " + msg);
+					}
+				};
+
+				CommonTokenStream tokenStream = new CommonTokenStream(lex);
+				ParserInterpreter parser = g.createParserInterpreter(tokenStream);
+				parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+				parser.removeErrorListeners();
+				parser.addErrorListener(printError);
+				String startRule = "assemble";
+				Rule start = g.getRule(startRule);
+				ParserRuleContext parserRuleContext = parser.parse(start.index);
+				System.out.println("parserRuleContext=" + parserRuleContext);
+				while (parserRuleContext.getParent() != null) {
+					parserRuleContext = parserRuleContext.getParent();
+				}
+				System.out.println("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 			}
-			ModuleLib.log(ast.toDot());
-
-			/*
-//			Lookup.Result<Openable> lookupResults = Utilities.actionsGlobalContext().lookupResult(Openable.class);
-//			for (Openable o : lookupResults.allInstances()) {
-//				ModuleLib.log("o=" + o);
-//			}
-//			Lookup.Result<FileObject> result = Utilities.actionsGlobalContext().lookupResult(FileObject.class);
-//			Lookup.Result<DataObject> result = Lookup.getDefault().lookupAll(DataObject.class);
-//			Collection<? extends FileObject> c = Lookup.getDefault().lookupAll(FileObject.class);
-//			ModuleLib.log("c2=" + result.allInstances());
-//			for (FileObject o : result.allInstances()) {
-//				ModuleLib.log("o=" + o);
-//			}
-//			DataObject DataObject = Utilities.actionsGlobalContext().lookup(DataObject.class);
-//			ModuleLib.log("DataObject=" + DataObject);
-
-			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().asText()));
-
-//		Token token = lexer.nextToken();
-//		while (token.getType() != Lexer.EOF) {
-//			System.out.println(token + "=" + ANTLRv4Lexer.VOCABULARY.getSymbolicName(token.getType()));
-//			token = lexer.nextToken();
-//		}
-			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-//		parser.addParseListener(listener);
-
-			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
-
-			ParseTreeWalker walker = new ParseTreeWalker();
-			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-			walker.walk(listener, context);
-
-			//ParseTree tree = parser.grammarSpec();
-			//parser.grammarSpec();
-			Ast ast = listener.getAst();
-			List<AstNode> nodes = ast.getNodes();
-//		System.out.println("nodes.size=" + nodes.size());
-//		for (AstNode n : nodes) {
-//			System.out.println(n);
-//			loop("", n);
-//		}
-			loop("", nodes.get(0));
-
-			MutableGraph g = Parser.read("graph {\n"
-					+ "    { rank=same; white}\n"
-					+ "    { rank=same; cyan; yellow; pink}\n"
-					+ "    { rank=same; red; green; blue}\n"
-					+ "    { rank=same; black}\n"
-					+ "\n"
-					+ "    white -- cyan -- blue\n"
-					+ "    white -- yellow -- green\n"
-					+ "    white -- pink -- red\n"
-					+ "\n"
-					+ "    cyan -- green -- black\n"
-					+ "    yellow -- red -- black\n"
-					+ "    pink -- blue -- black\n"
-					+ "}");
-//		Graphviz.fromGraph(g).width(700).render(Format.PNG).toFile(new File("example/ex4-1.png"));
-			g.generalAttrs()
-					.add(Color.WHITE.gradient(Color.rgb("888888")).background().angle(90))
-					.nodeAttrs().add(Color.WHITE.fill())
-					.nodes().forEach(node
-							-> node.add(
-							Color.named(node.label().toString()),
-							Style.lineWidth(4).and(Style.FILLED)));
-
-			BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
-			graphvizLabel.setIcon(new ImageIcon(image));
-			 */
 		} catch (Exception ex) {
-			ModuleLib.log(CommonLib.printException(ex));
+			ex.printStackTrace();
 		}
-
     }//GEN-LAST:event_refreshGraphvizButtonActionPerformed
 
-	void loop(String s, AstNode n) {
-		ModuleLib.log(s + n);
-		for (AstNode nn : n.getChildren()) {
-			loop(s + "    ", nn);
+	private void printAST(Tree child) {
+		printAST(child, "");
+	}
+
+	private void printAST(Tree child, String prefix) {
+		System.out.println(prefix + "-" + child);
+		prefix += "  ";
+		if (child.getChildCount() > 0) {
+			for (int x = 0; x < child.getChildCount(); x++) {
+				printAST(child.getChild(x), prefix);
+			}
 		}
 	}
 
