@@ -5,8 +5,18 @@ import java.nio.file.Paths;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.LexerInterpreter;
+import org.antlr.v4.runtime.ParserInterpreter;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTErrorNode;
 import org.antlr.v4.tool.ast.GrammarRootAST;
@@ -23,8 +33,7 @@ public class TestAntlrTool {
 //		String[] arg0 = {pathOfG4File, "-package", "mypackage"};
 //        Tool tool = new Tool(arg0);
 		Tool tool = new Tool();
-
-		String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
+		String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Assembler.g4").toURI())));
 		GrammarRootAST ast = tool.parseGrammarFromString(content);
 		System.out.println("ast.grammarType=" + ast.grammarType);
 		if (ast.grammarType == ANTLRParser.COMBINED) {
@@ -39,41 +48,42 @@ public class TestAntlrTool {
 				return;
 			}
 
-//		GrammarRootAST ast = (GrammarRootAST) t;
 			System.out.println(ast.toStringTree());
-
-//		String grammarName = ast.getChild(0).getText();
-//		System.out.println("grammarName=" + grammarName);
-//		String parserName = grammarName + "Parser";
-//		//String lexerName = grammarName+"Lexer";
-//		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-//		Class<? extends Parser> parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
-//		Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-//		Parser parser = parserCtor.newInstance((TokenStream) null);
-//		GrammarAST tokenVocabNode = findOptionValueAST(root, "tokenVocab");
-//		if (tokenVocabNode != null) {
-//			String vocabName = tokenVocabNode.getText();
-//			ModuleLib.log("vocabName=" + vocabName);
-//		}
 			Grammar g = tool.createGrammar(ast);
+			tool.process(g, false);
 			System.out.println("g=" + g);
 			System.out.println("tool=" + tool);
-			//tool.process(g, true);
-
-			//Grammar g = new Grammar(tool, (GrammarRootAST) t);
 			for (int x = 0; x < ast.getChildCount(); x++) {
 				printAST(ast.getChild(x));
 			}
-
-			//		GrammarTransformPipeline.setGrammarPtr(g, ast);
-			//		System.out.println("g=" + g);
-			/*for (String token : g.getTokenNames()) {
+			LexerInterpreter lex = g.createLexerInterpreter(new ANTLRInputStream(";comment1"));
+			for (Token token : lex.getAllTokens()) {
 				System.out.println("token=" + token);
 			}
-			for (String ruleName : g.getRuleNames()) {
-				System.out.println("ruleName=" + ruleName);
-			}*/
-			g.createParserInterpreter();
+			lex.reset();
+
+			BaseErrorListener printError = new BaseErrorListener() {
+				@Override
+				public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol,
+						final int line, final int position, final String msg,
+						final RecognitionException e) {
+					System.out.println(line + ":" + position + ": " + msg);
+				}
+			};
+
+			CommonTokenStream tokenStream = new CommonTokenStream(lex);
+			ParserInterpreter parser = g.createParserInterpreter(tokenStream);
+			parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+			parser.removeErrorListeners();
+			parser.addErrorListener(printError);
+			String startRule = "assemble";
+			Rule start = g.getRule(startRule);
+			ParserRuleContext parserRuleContext = parser.parse(start.index);
+			System.out.println("parserRuleContext=" + parserRuleContext);
+			while (parserRuleContext.getParent() != null) {
+				parserRuleContext = parserRuleContext.getParent();
+			}
+			System.out.println("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 		}
 	}
 

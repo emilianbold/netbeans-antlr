@@ -445,7 +445,7 @@ public class GenericParser {
 		listener.reset();
 
 		//CodePointCharStream input = CharStreams.fromString(toParse);
-		CharStream input = new ANTLRStringStream(toParse);
+		CharStream input = (CharStream) new ANTLRStringStream(toParse);
 
 		Objects.requireNonNull(input, "char stream must not be null");
 
