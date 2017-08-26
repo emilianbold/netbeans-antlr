@@ -6,12 +6,11 @@
 package com.github.mcheung63;
 
 import com.peterswing.CommonLib;
-import java.io.File;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -115,8 +114,9 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
 		try {
-			//String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
-			String content = FileUtils.readFileToString(new File("/Users/peter/NetBeansProjects/netbeans-antlr/src/test/resources/antlr/Calculator.g4"), "UTF-8");
+			ModuleLib.log("getClass().getResource(\"/test/Calculator.g4\")=" + getClass().getResource("/test/Calculator.g4"));
+			String content = IOUtils.toString(getClass().getResourceAsStream("/test/Calculator.g4"), "UTF-8");
+			//String content = FileUtils.readFileToString(new File("/Users/peter/NetBeansProjects/netbeans-antlr/src/test/resources/antlr/Calculator.g4"), "UTF-8");
 			GenericParser gp = new GenericParser(content);
 			DefaultTreeListener treeListener = new DefaultTreeListener();
 			gp.setListener(treeListener);
