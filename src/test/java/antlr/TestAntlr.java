@@ -1,30 +1,21 @@
 package antlr;
 
-import com.github.mcheung63.AstNode;
-import com.github.mcheung63.Ast;
-import com.github.mcheung63.MyANTLRv4ParserListener;
-import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.Style;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.MutableGraph;
-import guru.nidi.graphviz.parse.Parser;
+//import com.github.mcheung63.AstNode;
 import java.awt.image.BufferedImage;
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
-import org.antlr.parser.antlr4.ANTLRv4Parser;
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Test;
+import org.snt.inmemantlr.tree.AstNode;
 
 public class TestAntlr {
 
-	@Test
+	/*@Test
 	public void test() throws Exception {
 		System.out.println("test()");
 		ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(getClass().getResourceAsStream("simple1.g4")));
@@ -82,7 +73,7 @@ public class TestAntlr {
 		BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
 //		new JFrameWin(image).setVisible(true);
 //		Graphviz.fromGraph(g).width(700).render(Format.PNG).toFile(new File("example/ex4-2.png"));
-	}
+	}*/
 
 	void loop(String s, AstNode n) {
 		System.out.println(s + n);

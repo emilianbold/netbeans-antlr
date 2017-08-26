@@ -6,21 +6,12 @@
 package com.github.mcheung63;
 
 import com.peterswing.CommonLib;
-import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.Style;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.MutableGraph;
-import guru.nidi.graphviz.parse.Parser;
-import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
-import javax.swing.ImageIcon;
-import org.antlr.parser.antlr4.ANTLRv4Lexer;
-import org.antlr.parser.antlr4.ANTLRv4Parser;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.io.FileUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -31,6 +22,10 @@ import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
+import org.snt.inmemantlr.GenericParser;
+import org.snt.inmemantlr.listener.DefaultTreeListener;
+import org.snt.inmemantlr.tree.Ast;
+import org.snt.inmemantlr.tree.AstNode;
 
 /**
  * Top component which displays something.
@@ -120,7 +115,37 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
 		try {
+			//String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
+			String content = FileUtils.readFileToString(new File("/Users/peter/NetBeansProjects/netbeans-antlr/src/test/resources/antlr/Calculator.g4"), "UTF-8");
+			GenericParser gp = new GenericParser(content);
+			DefaultTreeListener treeListener = new DefaultTreeListener();
+			gp.setListener(treeListener);
+			gp.compile();
 
+//			MemoryTupleSet set = gp.getAllCompiledObjects();
+//			for (MemoryTuple tup : set) {
+//				System.out.println("tuple name " + tup.getClassName());
+//				System.out.println("source " + tup.getSource().getClassName());
+//				for (MemoryByteCode mc : tup.getByteCodeObjects()) {
+//					Objects.requireNonNull(mc, "MemoryByteCode must not be null");
+//					System.out.println("bc name: " + mc.getClassName());
+//
+//					if (!mc.isInnerClass()) {
+//						mc.getClassName().equals(tup.getSource().getClassName());
+//					} else {
+//						mc.getClassName().startsWith(tup.getSource().getClassName());
+//					}
+//				}
+//			}
+			ParserRuleContext ctx = gp.parse("1+2*(3+4)");
+			Ast ast = treeListener.getAst();
+			List<AstNode> nodes = ast.getNodes();
+			for (AstNode n : nodes) {
+				loop("", n);
+			}
+			ModuleLib.log(ast.toDot());
+
+			/*
 //			Lookup.Result<Openable> lookupResults = Utilities.actionsGlobalContext().lookupResult(Openable.class);
 //			for (Openable o : lookupResults.allInstances()) {
 //				ModuleLib.log("o=" + o);
@@ -132,8 +157,8 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 //			for (FileObject o : result.allInstances()) {
 //				ModuleLib.log("o=" + o);
 //			}
-			DataObject DataObject = Utilities.actionsGlobalContext().lookup(DataObject.class);
-			ModuleLib.log("DataObject=" + DataObject);
+//			DataObject DataObject = Utilities.actionsGlobalContext().lookup(DataObject.class);
+//			ModuleLib.log("DataObject=" + DataObject);
 
 			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().asText()));
 
@@ -188,14 +213,15 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
 			BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
 			graphvizLabel.setIcon(new ImageIcon(image));
-
+			 */
 		} catch (Exception ex) {
 			ModuleLib.log(CommonLib.printException(ex));
 		}
+
     }//GEN-LAST:event_refreshGraphvizButtonActionPerformed
 
 	void loop(String s, AstNode n) {
-		System.out.println(s + n);
+		ModuleLib.log(s + n);
 		for (AstNode nn : n.getChildren()) {
 			loop(s + "    ", nn);
 		}
