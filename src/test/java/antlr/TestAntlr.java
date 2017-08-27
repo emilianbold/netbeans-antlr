@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.junit.Test;
-import org.snt.inmemantlr.tree.AstNode;
 
 public class TestAntlr {
 
@@ -75,25 +74,25 @@ public class TestAntlr {
 //		Graphviz.fromGraph(g).width(700).render(Format.PNG).toFile(new File("example/ex4-2.png"));
 	}*/
 
-	void loop(String s, AstNode n) {
-		System.out.println(s + n);
-		for (AstNode nn : n.getChildren()) {
-			loop(s + "    ", nn);
-		}
-	}
-
-	public static class JFrameWin extends JFrame {
-
-		public JFrameWin(BufferedImage bufferedImage) {
-			this.setSize(800, 800);
-			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-			JLabel jLabel = new JLabel(new ImageIcon(bufferedImage));
-
-			JPanel jPanel = new JPanel();
-			jPanel.add(jLabel);
-			this.add(jPanel);
-		}
-
-	}
+//	void loop(String s, AstNode n) {
+//		System.out.println(s + n);
+//		for (AstNode nn : n.getChildren()) {
+//			loop(s + "    ", nn);
+//		}
+//	}
+//
+//	public static class JFrameWin extends JFrame {
+//
+//		public JFrameWin(BufferedImage bufferedImage) {
+//			this.setSize(800, 800);
+//			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//
+//			JLabel jLabel = new JLabel(new ImageIcon(bufferedImage));
+//
+//			JPanel jPanel = new JPanel();
+//			jPanel.add(jLabel);
+//			this.add(jPanel);
+//		}
+//
+//	}
 }

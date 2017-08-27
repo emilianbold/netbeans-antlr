@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -25,15 +26,16 @@ import org.junit.Test;
  *
  * @author Peter <peter@quantr.hk>
  */
-public class TestAntlrTool {
+public class TestAntlrToolGrammarTree {
 
 	@Test
-	public void testToolCompileProgramatically() throws Exception {
+	public void testToolGrammarTreeProgramatically() throws Exception {
 //		String[] arg0 = {pathOfG4File, "-package", "mypackage"};
 //        Tool tool = new Tool(arg0);
 		Tool tool = new Tool();
 		String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Assembler.g4").toURI())));
 		GrammarRootAST ast = tool.parseGrammarFromString(content);
+		printAST(ast, "");
 		System.out.println("ast.grammarType=" + ast.grammarType);
 		if (ast.grammarType == ANTLRParser.COMBINED) {
 			System.out.println("ast=" + ast);
@@ -49,10 +51,10 @@ public class TestAntlrTool {
 
 //			DefaultToolListener defaultToolListener = new DefaultToolListener(tool);
 //			System.out.println("ast.class=" + ast.getClass());
-//			printAST(ast, "");
 //			System.out.println("ast.toStringTree()=" + ast.toStringTree().replaceAll(" \\(RULE", "\n \\(RULE"));
 //			System.out.println("2 ast.toStringTree()=" + toStringTree(ast, ""));
 			Grammar grammar = tool.createGrammar(ast);
+			
 			tool.process(grammar, false);
 			System.out.println("grammar=" + grammar);
 			System.out.println("tool=" + tool);
@@ -97,12 +99,12 @@ public class TestAntlrTool {
 		}
 	}
 
-//	private void printAST(Tree child, String prefix) {
-//		System.out.println(prefix + child.toString());
-//		for (int x = 0; x < child.getChildCount(); x++) {
-//			printAST(child.getChild(x), prefix + "+---");
-//		}
-//	}
+	private void printAST(GrammarAST child, String prefix) {
+		System.out.println(prefix + child.toString());
+		for (int x = 0; x < child.getChildCount(); x++) {
+			printAST((GrammarAST) child.getChild(x), prefix + "+---");
+		}
+	}
 
 //	private TreeNode<Tree> buildTree(GrammarAST ast, TreeNode<Tree> lastNode) {
 //		if (ast.getChildren() == null || ast.getChildren().isEmpty()) {
