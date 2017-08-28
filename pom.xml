@@ -174,16 +174,17 @@
 			<groupId>guru.nidi</groupId>
 			<artifactId>graphviz-java</artifactId>
 			<version>0.2.1</version>
-			<exclusions>
-				<!--				<exclusion>
+<!--			<exclusions>
+				<exclusion>
 					<groupId>org.apache.xmlgraphics</groupId>
 					<artifactId>batik-rasterizer</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.xmlgraphics</groupId>
 					<artifactId>batik-codec</artifactId>
-				</exclusion>-->
-			</exclusions>
+				</exclusion>
+			</exclusions>-->
+			
 		</dependency>
 		
 		<!--		<dependency>

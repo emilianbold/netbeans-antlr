@@ -5,31 +5,20 @@
  */
 package com.github.mcheung63;
 
+import com.github.mcheung63.syntax.antlr4.Ast;
+import com.github.mcheung63.syntax.antlr4.AstNode;
 import com.peterswing.CommonLib;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
+import java.io.File;
 import java.util.Collection;
-import java.util.List;
+import javax.swing.ImageIcon;
+import org.antlr.parser.antlr4.ANTLRv4Lexer;
+import org.antlr.parser.antlr4.ANTLRv4Parser;
 import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.Tool;
-import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.LexerInterpreter;
-import org.antlr.v4.runtime.ParserInterpreter;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.ast.GrammarASTErrorNode;
-import org.antlr.v4.tool.ast.GrammarRootAST;
-import org.apache.commons.io.IOUtils;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.io.FileUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -129,62 +118,43 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
 		try {
-			Tool tool = new Tool();
-			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			System.out.println("getClass().getResource(\"/test/Assembler.g4\")=" + classLoader.getResource("../../../test/Assembler.g4"));
-			System.out.println("getClass().getResource(\"/test/Assembler.g4\")=" + classLoader.getResource("../../test/Assembler.g4"));
-			System.out.println("getClass().getResource(\"/test/Assembler.g4\")=" + classLoader.getResource("../test/Assembler.g4"));
-			String content = IOUtils.toString(classLoader.getResourceAsStream("/test/Assembler.g4"), "UTF-8");
-			GrammarRootAST ast = tool.parseGrammarFromString(content);
-			System.out.println("ast.grammarType=" + ast.grammarType);
-			if (ast.grammarType == ANTLRParser.COMBINED) {
-				System.out.println("ast=" + ast);
-				if ((GrammarAST) ast instanceof GrammarASTErrorNode) {
-					System.out.println("GrammarASTErrorNode");
-					return;
+			if (lastDataObject != null) {
+//				String content = IOUtils.toString(lastDataObject.getPrimaryFile().getInputStream(), "UTF-8");
+				ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().getInputStream()));
+				CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+				ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
+				ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
+				ParseTreeWalker walker = new ParseTreeWalker();
+				com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener listener = new com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener(parser);
+				walker.walk(listener, context);
+
+				Ast ast = listener.ast;
+				AstNode root = ast.getRoot();
+				AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
+				//removeOneLeftNodes(root);
+				AntlrLib.printAst("", root);
+
+				String dot = AntlrLib.exportDot(root);
+
+				System.out.println(dot);
+
+				File file = new File("/Users/peter/Desktop/a.dot");
+				FileUtils.writeStringToFile(file, dot, "UTF-8");
+//				MutableGraph g = Parser.read(dot);
+//				BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
+				JProgressBarDialog d = new JProgressBarDialog("Generating dot...", true);
+				d.progressBar.setIndeterminate(true);
+				d.progressBar.setStringPainted(true);
+				d.progressBar.setString("running dot command : " + "dot -Tpng " + file.getName() + " -o elf.png");
+				if (ModuleLib.isMac()) {
+					CommonLib.runCommand("/opt/local/bin/dot -Tpng " + file.getName() + " -o elf.png");
+				} else {
+					CommonLib.runCommand("dot -Tpng " + file.getName() + " -o elf.png");
 				}
 
-				if (ast.hasErrors) {
-					System.out.println("hasErrors");
-					return;
-				}
-
-				System.out.println(ast.toStringTree());
-				Grammar g = tool.createGrammar(ast);
-				tool.process(g, false);
-				System.out.println("g=" + g);
-				System.out.println("tool=" + tool);
-				for (int x = 0; x < ast.getChildCount(); x++) {
-					printAST(ast.getChild(x));
-				}
-				LexerInterpreter lex = g.createLexerInterpreter(new ANTLRInputStream(";comment1"));
-				for (Token token : lex.getAllTokens()) {
-					System.out.println("token=" + token);
-				}
-				lex.reset();
-
-				BaseErrorListener printError = new BaseErrorListener() {
-					@Override
-					public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol,
-							final int line, final int position, final String msg,
-							final RecognitionException e) {
-						System.out.println(line + ":" + position + ": " + msg);
-					}
-				};
-
-				CommonTokenStream tokenStream = new CommonTokenStream(lex);
-				ParserInterpreter parser = g.createParserInterpreter(tokenStream);
-				parser.getInterpreter().setPredictionMode(PredictionMode.LL);
-				parser.removeErrorListeners();
-				parser.addErrorListener(printError);
-				String startRule = "assemble";
-				Rule start = g.getRule(startRule);
-				ParserRuleContext parserRuleContext = parser.parse(start.index);
-				System.out.println("parserRuleContext=" + parserRuleContext);
-				while (parserRuleContext.getParent() != null) {
-					parserRuleContext = parserRuleContext.getParent();
-				}
-				System.out.println("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
+				ImageIcon icon = new ImageIcon(file.getAbsolutePath());
+//				icon.getImage().flush();
+				graphvizLabel.setIcon(icon);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -239,11 +209,9 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
 	@Override
 	public void resultChanged(LookupEvent le) {
-		Collection<? extends DataObject> shits = result.allInstances();
-		for (DataObject d : shits) {
-			ModuleLib.log("resultChanged=" + d);
+		Collection<? extends DataObject> dataObjects = result.allInstances();
+		for (DataObject d : dataObjects) {
 			lastDataObject = d;
 		}
-		ModuleLib.log("-------------");
 	}
 }

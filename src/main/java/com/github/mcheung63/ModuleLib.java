@@ -44,4 +44,12 @@ public class ModuleLib {
 		ex.printStackTrace(new PrintWriter(errors));
 		return errors.toString();
 	}
+
+	public static boolean isMac() {
+		if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
