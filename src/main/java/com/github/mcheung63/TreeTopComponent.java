@@ -9,12 +9,14 @@ import com.github.mcheung63.syntax.antlr4.Ast;
 import com.github.mcheung63.syntax.antlr4.AstNode;
 import com.peterswing.CommonLib;
 import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
+import java.awt.Image;
 import java.io.File;
+import java.nio.file.Files;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.Collection;
 import javax.swing.ImageIcon;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
 import org.antlr.parser.antlr4.ANTLRv4Parser;
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -29,6 +31,8 @@ import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
+import javax.swing.tree.DefaultTreeModel;
+import org.openide.util.Exceptions;
 
 /**
  * Top component which displays something.
@@ -58,6 +62,11 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
 	Lookup.Result<DataObject> result;
 	DataObject lastDataObject;
+	File pngFileName;
+	int preferWidth;
+	int preferHeight;
+	AntlrTreeNode rootNode = new AntlrTreeNode("os", "os");
+	DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
 
 	public TreeTopComponent() {
 		initComponents();
@@ -66,6 +75,10 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
 		result = Utilities.actionsGlobalContext().lookupResult(DataObject.class);
 		result.addLookupListener(this);
+
+		antlrTree.setModel(treeModel);
+		antlrTree.setCellRenderer(new AntlrTreeRenderer());
+		antlrTree.setShowsRootHandles(true);
 	}
 
 	/**
@@ -74,23 +87,29 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        mainTabbedPane = new javax.swing.JTabbedPane();
+        graphvizPanel = new javax.swing.JPanel();
         graphvizScrollPane = new javax.swing.JScrollPane();
         graphvizLabel = new javax.swing.JLabel();
         jToolBar1 = new javax.swing.JToolBar();
         refreshGraphvizButton = new javax.swing.JButton();
+        zoomOutButton = new javax.swing.JButton();
+        show100ImageButton = new javax.swing.JButton();
+        zoomInButton = new javax.swing.JButton();
+        treePanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTree1 = new javax.swing.JTree();
+        antlrTree = new javax.swing.JTree();
+        jToolBar2 = new javax.swing.JToolBar();
+        refreshAntlrTreeButton = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        graphvizPanel.setLayout(new java.awt.BorderLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(graphvizLabel, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.graphvizLabel.text")); // NOI18N
         graphvizScrollPane.setViewportView(graphvizLabel);
 
-        jPanel1.add(graphvizScrollPane, java.awt.BorderLayout.CENTER);
+        graphvizPanel.add(graphvizScrollPane, java.awt.BorderLayout.CENTER);
 
         jToolBar1.setRollover(true);
 
@@ -105,15 +124,67 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
         });
         jToolBar1.add(refreshGraphvizButton);
 
-        jPanel1.add(jToolBar1, java.awt.BorderLayout.PAGE_START);
+        org.openide.awt.Mnemonics.setLocalizedText(zoomOutButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.zoomOutButton.text")); // NOI18N
+        zoomOutButton.setFocusable(false);
+        zoomOutButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        zoomOutButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        zoomOutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomOutButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(zoomOutButton);
 
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(show100ImageButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.show100ImageButton.text")); // NOI18N
+        show100ImageButton.setFocusable(false);
+        show100ImageButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        show100ImageButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        show100ImageButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                show100ImageButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(show100ImageButton);
 
-        jScrollPane1.setViewportView(jTree1);
+        org.openide.awt.Mnemonics.setLocalizedText(zoomInButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.zoomInButton.text")); // NOI18N
+        zoomInButton.setFocusable(false);
+        zoomInButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        zoomInButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        zoomInButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomInButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(zoomInButton);
 
-        jTabbedPane1.addTab("tab1", jScrollPane1);
+        graphvizPanel.add(jToolBar1, java.awt.BorderLayout.PAGE_START);
 
-        add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        mainTabbedPane.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.graphvizPanel.TabConstraints.tabTitle"), graphvizPanel); // NOI18N
+
+        treePanel.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane1.setViewportView(antlrTree);
+
+        treePanel.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jToolBar2.setRollover(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(refreshAntlrTreeButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.refreshAntlrTreeButton.text")); // NOI18N
+        refreshAntlrTreeButton.setFocusable(false);
+        refreshAntlrTreeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        refreshAntlrTreeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        refreshAntlrTreeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshAntlrTreeButtonActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(refreshAntlrTreeButton);
+
+        treePanel.add(jToolBar2, java.awt.BorderLayout.PAGE_START);
+
+        mainTabbedPane.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.treePanel.TabConstraints.tabTitle"), treePanel); // NOI18N
+
+        add(mainTabbedPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
@@ -131,59 +202,116 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 				Ast ast = listener.ast;
 				AstNode root = ast.getRoot();
 				AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
-				//removeOneLeftNodes(root);
+				AntlrLib.removeOneLeafNodes(root);
 				AntlrLib.printAst("", root);
 
 				String dot = AntlrLib.exportDot(root);
 
 				System.out.println(dot);
 
-				File file = new File("/Users/peter/Desktop/a.dot");
-				FileUtils.writeStringToFile(file, dot, "UTF-8");
+				File dotFile = File.createTempFile("netbeans-antlr", ".dot");
+				File dotPngFile = File.createTempFile("netbeans-antlr", ".png");
+				FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
 //				MutableGraph g = Parser.read(dot);
 //				BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
 				JProgressBarDialog d = new JProgressBarDialog("Generating dot...", true);
 				d.progressBar.setIndeterminate(true);
 				d.progressBar.setStringPainted(true);
-				d.progressBar.setString("running dot command : " + "dot -Tpng " + file.getName() + " -o elf.png");
+				d.progressBar.setString("running dot command : " + "dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
 				if (ModuleLib.isMac()) {
-					CommonLib.runCommand("/opt/local/bin/dot -Tpng " + file.getName() + " -o elf.png");
+					CommonLib.runCommand("/opt/local/bin/dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
 				} else {
-					CommonLib.runCommand("dot -Tpng " + file.getName() + " -o elf.png");
+					CommonLib.runCommand("dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
 				}
-
-				ImageIcon icon = new ImageIcon(file.getAbsolutePath());
+				Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
+				ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
+				pngFileName = dotPngFile;
 //				icon.getImage().flush();
 				graphvizLabel.setIcon(icon);
+
+				preferWidth = graphvizLabel.getWidth() > icon.getIconWidth() ? icon.getIconWidth() : graphvizLabel.getWidth();
+				float ratio = ((float) preferWidth) / icon.getIconWidth();
+				if (ratio == 0) {
+					ratio = 1;
+				}
+				preferHeight = (int) (icon.getIconHeight() * ratio);
+
+				dotFile.delete();
+				dotPngFile.deleteOnExit();
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
     }//GEN-LAST:event_refreshGraphvizButtonActionPerformed
 
-	private void printAST(Tree child) {
-		printAST(child, "");
-	}
-
-	private void printAST(Tree child, String prefix) {
-		System.out.println(prefix + "-" + child);
-		prefix += "  ";
-		if (child.getChildCount() > 0) {
-			for (int x = 0; x < child.getChildCount(); x++) {
-				printAST(child.getChild(x), prefix);
-			}
+    private void show100ImageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_show100ImageButtonActionPerformed
+		if (pngFileName != null && pngFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngFileName.getAbsolutePath());
+			icon.getImage().flush();
+			preferWidth = icon.getIconWidth();
+			preferHeight = icon.getIconHeight();
+			graphvizLabel.setIcon(resizeImage(icon, icon.getIconWidth(), icon.getIconHeight()));
 		}
-	}
+    }//GEN-LAST:event_show100ImageButtonActionPerformed
+
+    private void zoomOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutButtonActionPerformed
+		if (pngFileName != null && pngFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngFileName.getAbsolutePath());
+			icon.getImage().flush();
+			preferWidth = (int) (((float) preferWidth) * 0.9);
+			preferHeight = (int) (((float) preferHeight) * 0.9);
+			graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+		}
+    }//GEN-LAST:event_zoomOutButtonActionPerformed
+
+    private void zoomInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInButtonActionPerformed
+		if (pngFileName != null && pngFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngFileName.getAbsolutePath());
+
+			icon.getImage().flush();
+			preferWidth = (int) (((float) preferWidth) * 1.1);
+			preferHeight = (int) (((float) preferHeight) * 1.1);
+			graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+		}
+    }//GEN-LAST:event_zoomInButtonActionPerformed
+
+    private void refreshAntlrTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshAntlrTreeButtonActionPerformed
+		try {
+			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().getInputStream()));
+			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
+			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
+			ParseTreeWalker walker = new ParseTreeWalker();
+			com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener listener = new com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener(parser);
+			walker.walk(listener, context);
+
+			Ast ast = listener.ast;
+			AstNode root = ast.getRoot();
+//			AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
+			AntlrLib.removeOneLeafNodes(root);
+			AntlrLib.buildTree(root, rootNode);
+			CommonLib.expandAll(antlrTree, true);
+		} catch (Exception ex) {
+			Exceptions.printStackTrace(ex);
+		}
+    }//GEN-LAST:event_refreshAntlrTreeButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTree antlrTree;
     private javax.swing.JLabel graphvizLabel;
+    private javax.swing.JPanel graphvizPanel;
     private javax.swing.JScrollPane graphvizScrollPane;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JTree jTree1;
+    private javax.swing.JToolBar jToolBar2;
+    private javax.swing.JTabbedPane mainTabbedPane;
+    private javax.swing.JButton refreshAntlrTreeButton;
     private javax.swing.JButton refreshGraphvizButton;
+    private javax.swing.JButton show100ImageButton;
+    private javax.swing.JPanel treePanel;
+    private javax.swing.JButton zoomInButton;
+    private javax.swing.JButton zoomOutButton;
     // End of variables declaration//GEN-END:variables
 	@Override
 	public void componentOpened() {
@@ -213,5 +341,9 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 		for (DataObject d : dataObjects) {
 			lastDataObject = d;
 		}
+	}
+
+	ImageIcon resizeImage(ImageIcon icon, int width, int height) {
+		return new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
 	}
 }

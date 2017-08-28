@@ -21,14 +21,13 @@ public class AstNode {
 	private int sidx = 0;
 	private int eidx = 0;
 
-	private List<AstNode> children;
+	private List<AstNode> children = new Vector<>();
 	private static int cnt = 0;
 	private static final Set<Character> SPECIAL = Stream.of('+', '{', '}', '(', ')', '[', ']', '&', '^', '-', '?', '*', '\"', '$', '<', '>', '.', '|', '#').collect(toSet());
 
 	private AstNode(Ast tree) {
 		this.tree = tree;
 		id = cnt++;
-		children = new Vector<>();
 	}
 
 	protected AstNode(Ast tree, AstNode parent, String nt, String label, int sidx, int eidx) {
@@ -174,5 +173,9 @@ public class AstNode {
 			}
 		}
 		return out.toString();
+	}
+
+	public int getChildrenSize() {
+		return children.size();
 	}
 }
