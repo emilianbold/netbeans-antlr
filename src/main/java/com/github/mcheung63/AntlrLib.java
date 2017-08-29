@@ -26,34 +26,34 @@ public class AntlrLib {
 //			}
 //		}
 
-		System.out.println("current=" + processLabel(node.getRule(), node.getLabel()));
+		System.out.println("current=" + processLabel(node));
 		for (int x = 0; x < node.getChildren().size(); x++) {
 			AstNode nextNode = node.getChild(x);
 
-			System.out.println("\tnextNode=" + processLabel(nextNode.getRule(), nextNode.getLabel()));
+			System.out.println("\tnextNode=" + processLabel(nextNode));
 
-			String nextNodeLabel = processLabel(nextNode.getRule(), nextNode.getLabel());
+			String nextNodeLabel = processLabel(nextNode);
 			if (nextNodeLabel.equals("STRING")) {
 				System.out.println("break");
 			}
 
 			if (nextNode.getChildrenSize() == 1) {
 				AstNode nextNextNode = nextNode.getChild(0);
-				String nextNextNodeLabel = processLabel(nextNextNode.getRule(), nextNextNode.getLabel());
+				String nextNextNodeLabel = processLabel(nextNextNode);
 				if (!nextNodeLabel.equals(nextNextNodeLabel)) {
 					break;
 				}
 
 				while (nextNextNode.getChildrenSize() == 1) {
-					String temp = processLabel(nextNextNode.getChild(0).getRule(), nextNextNode.getChild(0).getLabel());
+					String temp = processLabel(nextNextNode.getChild(0));
 					if (!nextNextNodeLabel.equals(temp)) {
 						break;
 					}
 
 					nextNextNode = nextNextNode.getChild(0);
 				}
-				System.out.println("\t\tremove " + processLabel(node.getRule(), node.getLabel()) + " -> " + processLabel(nextNextNode.getRule(), nextNextNode.getLabel()));
-				
+				System.out.println("\t\tremove " + processLabel(node) + " -> " + processLabel(nextNextNode));
+
 				node.getChildren().set(x, nextNextNode);
 			}
 		}
@@ -117,7 +117,7 @@ public class AntlrLib {
 	}
 
 	public static void exportDotChild(String currentNodeText, AstNode node, StringBuffer sb) {
-		String nodeText = processLabel(node.getRule(), node.getLabel());
+		String nodeText = processLabel(node);
 		String nodeID = node.getRule() + "-" + (id++);
 		sb.append("\"" + nodeID + "\" [label=\"" + nodeText + "\"]\n");
 		sb.append("\"" + currentNodeText + "\" -> \"" + nodeID + "\"\n");
@@ -141,7 +141,9 @@ public class AntlrLib {
 //			rank(rootNode.children.get(x), sb, lastDotNode, nodesInLevel, level + 1);
 //		}
 //	}
-	public static String processLabel(String rule, String label) {
+	public static String processLabel(AstNode node) {
+		String rule = node.getRule();
+		String label = node.getLabel();
 		if (label.contains(":")) {
 			label = label.split(":")[0];
 		}
@@ -156,13 +158,12 @@ public class AntlrLib {
 	}
 
 	public static void buildTree(AstNode node, AntlrTreeNode rootNode) {
-		String realLabel = node.getLabel().replaceAll("\\\\t", "T").replaceAll("\\\\n", "N").replaceAll("\\\\r", "R");
-		if (realLabel.contains(":")) {
-			realLabel = realLabel.split(":")[0];
-		}
-		AntlrTreeNode newNode = new AntlrTreeNode(realLabel, realLabel);
-		rootNode.add(newNode);
 		for (AstNode nn : node.getChildren()) {
+			String realLabel = processLabel(nn);
+
+			AntlrTreeNode newNode = new AntlrTreeNode(realLabel, realLabel);
+			rootNode.add(newNode);
+			newNode.setParent(rootNode);
 			buildTree(nn, newNode);
 		}
 	}

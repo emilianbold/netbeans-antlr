@@ -1,12 +1,13 @@
 package com.github.mcheung63;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class AntlrTreeNode extends DefaultMutableTreeNode {
+
 	String type;
 	String text;
+	public boolean visible;
 //	Icon os = new ImageIcon(getClass().getClassLoader().getResource("com/gkd/images/OSDebug/os.png"));
 //	Icon kernel = new ImageIcon(getClass().getClassLoader().getResource("com/gkd/images/OSDebug/kernel.png"));
 //	Icon device = new ImageIcon(getClass().getClassLoader().getResource("com/gkd/images/OSDebug/device.png"));
@@ -21,6 +22,7 @@ public class AntlrTreeNode extends DefaultMutableTreeNode {
 	public AntlrTreeNode(String text, String type) {
 		this.text = text;
 		this.type = type;
+		visible = true;
 	}
 
 	public String getType() {
@@ -61,12 +63,21 @@ public class AntlrTreeNode extends DefaultMutableTreeNode {
 //		} else if (type.equals("library")) {
 //			return library;
 //		} else {
-			return null;
+		return null;
 //		}
 	}
 
 	public String toString() {
 		return type;
+	}
+
+	@Override
+	public int getChildCount() {
+		if (visible) {
+			return super.getChildCount();
+		} else {
+			return 0;
+		}
 	}
 
 }

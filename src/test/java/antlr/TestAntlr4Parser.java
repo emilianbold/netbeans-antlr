@@ -51,7 +51,7 @@ public class TestAntlr4Parser {
 		File dotFile = File.createTempFile("netbeans-antlr", ".dot");
 		FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
 		String command = "/opt/local/bin/dot -Tpng " + dotFile.getAbsolutePath() + " -o /Users/peter/Desktop/a.png";
-		System.out.println(command);
+		//System.out.println(command);
 		CommonLib.runCommand(command);
 		dotFile.delete();
 //		FileUtils.writeStringToFile(new File("/Users/peter/Desktop/a.dot"), dot, "UTF-8");

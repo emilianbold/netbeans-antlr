@@ -7,6 +7,7 @@ package com.github.mcheung63;
 
 import com.github.mcheung63.syntax.antlr4.Ast;
 import com.github.mcheung63.syntax.antlr4.AstNode;
+import com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener;
 import com.peterswing.CommonLib;
 import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
 import java.awt.Image;
@@ -101,6 +102,9 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
         antlrTree = new javax.swing.JTree();
         jToolBar2 = new javax.swing.JToolBar();
         refreshAntlrTreeButton = new javax.swing.JButton();
+        expandTreeButton = new javax.swing.JButton();
+        collapseTreeButton = new javax.swing.JButton();
+        searchAntlrTreeTextField = new com.peterswing.advancedswing.searchtextfield.JSearchTextField();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -180,6 +184,37 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
         });
         jToolBar2.add(refreshAntlrTreeButton);
 
+        org.openide.awt.Mnemonics.setLocalizedText(expandTreeButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.expandTreeButton.text")); // NOI18N
+        expandTreeButton.setFocusable(false);
+        expandTreeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        expandTreeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        expandTreeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                expandTreeButtonActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(expandTreeButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(collapseTreeButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.collapseTreeButton.text")); // NOI18N
+        collapseTreeButton.setFocusable(false);
+        collapseTreeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        collapseTreeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        collapseTreeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                collapseTreeButtonActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(collapseTreeButton);
+
+        searchAntlrTreeTextField.setText(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.searchAntlrTreeTextField.text")); // NOI18N
+        searchAntlrTreeTextField.setMaximumSize(new java.awt.Dimension(200, 25));
+        searchAntlrTreeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                searchAntlrTreeTextFieldKeyPressed(evt);
+            }
+        });
+        jToolBar2.add(searchAntlrTreeTextField);
+
         treePanel.add(jToolBar2, java.awt.BorderLayout.PAGE_START);
 
         mainTabbedPane.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.treePanel.TabConstraints.tabTitle"), treePanel); // NOI18N
@@ -196,7 +231,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 				ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
 				ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
 				ParseTreeWalker walker = new ParseTreeWalker();
-				com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener listener = new com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener(parser);
+				MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
 				walker.walk(listener, context);
 
 				Ast ast = listener.ast;
@@ -282,13 +317,14 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
 			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
 			ParseTreeWalker walker = new ParseTreeWalker();
-			com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener listener = new com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener(parser);
+			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
 			walker.walk(listener, context);
 
 			Ast ast = listener.ast;
 			AstNode root = ast.getRoot();
 			AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
 			AntlrLib.removeOneLeafNodes(root);
+			rootNode.removeAllChildren();
 			AntlrLib.buildTree(root, rootNode);
 			CommonLib.expandAll(antlrTree, true);
 		} catch (Exception ex) {
@@ -296,9 +332,29 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 		}
     }//GEN-LAST:event_refreshAntlrTreeButtonActionPerformed
 
+    private void expandTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expandTreeButtonActionPerformed
+		CommonLib.expandAll(antlrTree, true);
+    }//GEN-LAST:event_expandTreeButtonActionPerformed
+
+    private void collapseTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_collapseTreeButtonActionPerformed
+		CommonLib.expandAll(antlrTree, false);
+    }//GEN-LAST:event_collapseTreeButtonActionPerformed
+
+    private void searchAntlrTreeTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchAntlrTreeTextFieldKeyPressed
+		ModuleLib.log(evt.getKeyCode());
+		if (evt.getKeyCode() == 10) {
+			visibleNode(rootNode, false);
+			filterTreeNode(rootNode, searchAntlrTreeTextField.getText());
+			treeModel.reload();
+			CommonLib.expandAll(antlrTree, true);
+		}
+    }//GEN-LAST:event_searchAntlrTreeTextFieldKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTree antlrTree;
+    private javax.swing.JButton collapseTreeButton;
+    private javax.swing.JButton expandTreeButton;
     private javax.swing.JLabel graphvizLabel;
     private javax.swing.JPanel graphvizPanel;
     private javax.swing.JScrollPane graphvizScrollPane;
@@ -308,6 +364,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
     private javax.swing.JTabbedPane mainTabbedPane;
     private javax.swing.JButton refreshAntlrTreeButton;
     private javax.swing.JButton refreshGraphvizButton;
+    private com.peterswing.advancedswing.searchtextfield.JSearchTextField searchAntlrTreeTextField;
     private javax.swing.JButton show100ImageButton;
     private javax.swing.JPanel treePanel;
     private javax.swing.JButton zoomInButton;
@@ -339,11 +396,35 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 	public void resultChanged(LookupEvent le) {
 		Collection<? extends DataObject> dataObjects = result.allInstances();
 		for (DataObject d : dataObjects) {
-			lastDataObject = d;
+			if (d.getPrimaryFile().getExt().equals("g4")) {
+				lastDataObject = d;
+			}
 		}
 	}
 
 	ImageIcon resizeImage(ImageIcon icon, int width, int height) {
 		return new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+	}
+
+	private void visibleNode(AntlrTreeNode node, boolean b) {
+		rootNode.visible = b;
+		for (int x = 0; x < node.getChildCount(); x++) {
+			visibleNode((AntlrTreeNode) node.getChildAt(x), b);
+		}
+	}
+
+	private void filterTreeNode(AntlrTreeNode node, String text) {
+		if (node.text.toLowerCase().contains(text.toLowerCase())) {
+			ModuleLib.log("hit=" + node.text);
+			AntlrTreeNode nn = node;
+			do {
+				nn.visible = true;
+				nn = (AntlrTreeNode) nn.getParent();
+			} while (nn != null);
+		}
+
+		for (int x = 0; x < node.getChildCount(); x++) {
+			filterTreeNode((AntlrTreeNode) node.getChildAt(x), text);
+		}
 	}
 }
