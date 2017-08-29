@@ -65,7 +65,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 	File pngFileName;
 	int preferWidth;
 	int preferHeight;
-	AntlrTreeNode rootNode = new AntlrTreeNode("os", "os");
+	AntlrTreeNode rootNode = new AntlrTreeNode("Grammar", "Grammar");
 	DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
 
 	public TreeTopComponent() {
@@ -287,7 +287,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
 			Ast ast = listener.ast;
 			AstNode root = ast.getRoot();
-//			AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
+			AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
 			AntlrLib.removeOneLeafNodes(root);
 			AntlrLib.buildTree(root, rootNode);
 			CommonLib.expandAll(antlrTree, true);
