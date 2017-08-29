@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.antlr.parser.antlr4.ANTLRv4Parser;
 import org.antlr.parser.antlr4.ANTLRv4ParserBaseListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -31,11 +32,11 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 		String ruleName = getRuleByKey(ctx.getRuleIndex());
 		//System.out.println("rule " + ruleName + " -- " + ctx.getText());
 //		if (filter.test(ruleName)) {
-			Token s = ctx.getStart();
-			Token e = ctx.getStop();
-			AstNode n = ast.newNode(parentNode, ruleName, ctx.getText(), s != null ? s.getStartIndex() : 0, e != null ? e.getStopIndex() : 0);
-			parentNode.addChild(n);
-			parentNode = n;
+		Token s = ctx.getStart();
+		Token e = ctx.getStop();
+		AstNode n = ast.newNode(parentNode, ruleName, ctx.getText(), s != null ? s.getStartIndex() : 0, e != null ? e.getStopIndex() : 0);
+		parentNode.addChild(n);
+		parentNode = n;
 //		}
 	}
 
@@ -43,8 +44,14 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 	public void exitEveryRule(ParserRuleContext ctx) {
 		String rule = getRuleByKey(ctx.getRuleIndex());
 //		if (filter.test(rule)) {
-			parentNode = parentNode.getParent();
+		parentNode = parentNode.getParent();
 //		}
+	}
+
+	@Override
+	public void enterGrammarSpec(ANTLRv4Parser.GrammarSpecContext ctx) {
+		System.out.println("\t\t\t\t\tenterGrammarSpec=" + ctx.identifier().getText());
+		ast.getRoot().setLabel(ctx.identifier().getText());
 	}
 
 	public String getRuleByKey(int key) {
