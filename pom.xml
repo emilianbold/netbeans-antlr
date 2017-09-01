@@ -18,6 +18,13 @@
 				<extensions>true</extensions>
 				<configuration>
 					<useOSGiDependencies>false</useOSGiDependencies>
+					<moduleDependencies>
+						<dependency>
+							<id>org.netbeans.api:org-netbeans-modules-editor-lib2</id>
+							<type>impl</type>
+							<explicitValue>org.netbeans.modules.editor.lib2/1 = 56</explicitValue>
+						</dependency>
+					</moduleDependencies>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -174,7 +181,7 @@
 			<groupId>guru.nidi</groupId>
 			<artifactId>graphviz-java</artifactId>
 			<version>0.2.1</version>
-<!--			<exclusions>
+			<!--			<exclusions>
 				<exclusion>
 					<groupId>org.apache.xmlgraphics</groupId>
 					<artifactId>batik-rasterizer</artifactId>
@@ -254,5 +261,16 @@
 			<artifactId>commons-text</artifactId>
 			<version>1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-modules-editor-lib2</artifactId>
+			<version>RELEASE82</version>
+		</dependency>
+	 <dependency>
+	  <groupId>org.netbeans.api</groupId>
+	  <artifactId>org-netbeans-modules-editor-lib</artifactId>
+	  <version>RELEASE82</version>
+	  <type>jar</type>
+	 </dependency>
 	</dependencies>
 </project>
