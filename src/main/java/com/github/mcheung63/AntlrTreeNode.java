@@ -4,7 +4,7 @@ import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class AntlrTreeNode extends DefaultMutableTreeNode {
-
+	
 	String type;
 	String text;
 	public boolean visible;
@@ -24,23 +24,23 @@ public class AntlrTreeNode extends DefaultMutableTreeNode {
 		this.type = type;
 		visible = true;
 	}
-
+	
 	public String getType() {
 		return type;
 	}
-
+	
 	public void setType(String type) {
 		this.type = type;
 	}
-
+	
 	public String getText() {
 		return text;
 	}
-
+	
 	public void setText(String text) {
 		this.text = text;
 	}
-
+	
 	public Icon getIcon() {
 //		if (type.equals("os")) {
 //			return os;
@@ -66,18 +66,50 @@ public class AntlrTreeNode extends DefaultMutableTreeNode {
 		return null;
 //		}
 	}
-
+	
 	public String toString() {
-		return type;
+		return text;
 	}
-
-	@Override
-	public int getChildCount() {
-		if (visible) {
-			return super.getChildCount();
-		} else {
-			return 0;
-		}
-	}
-
+	
+//	@Override
+//	public int getChildCount() {
+//		if (visible) {
+//			int count = 0;
+//			for (int x = 0; x < super.getChildCount(); x++) {
+//				if (((AntlrTreeNode) super.getChildAt(x)).visible) {
+//					count++;
+//				}
+//			}
+//			return count;
+//		} else {
+//			return 0;
+//		}
+//	}
+	
+//	@Override
+//	public javax.swing.tree.TreeNode getChildAt(int index) {
+//		if (children == null) {
+//			throw new ArrayIndexOutOfBoundsException("node has no children");
+//		}
+//		int count = 0;
+//		for (int x = 0; x < super.getChildCount(); x++) {
+//			if (((AntlrTreeNode) super.getChildAt(x)).visible) {
+//				count++;
+//			}
+//			if (count == index - 1) {
+//				return super.getChildAt(x);
+//			}
+//		}
+//		ModuleLib.log("FUCK");
+//		return null;
+//	}
+//	
+//	public int getRealChildCount() {
+//		return super.getChildCount();
+//	}
+//	
+//	public javax.swing.tree.TreeNode getRealChildAt(int index) {
+//		return super.getChildAt(index);
+//	}
+	
 }

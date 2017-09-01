@@ -67,7 +67,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 	int preferWidth;
 	int preferHeight;
 	AntlrTreeNode rootNode = new AntlrTreeNode("Grammar", "Grammar");
-	DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
+	AntlrTreeModel treeModel = new AntlrTreeModel(rootNode);
 
 	public TreeTopComponent() {
 		initComponents();
@@ -97,6 +97,8 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
         zoomOutButton = new javax.swing.JButton();
         show100ImageButton = new javax.swing.JButton();
         zoomInButton = new javax.swing.JButton();
+        graphvizFitWidthButton = new javax.swing.JButton();
+        graphvizFitHeightButton = new javax.swing.JButton();
         treePanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         antlrTree = new javax.swing.JTree();
@@ -160,6 +162,28 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
             }
         });
         jToolBar1.add(zoomInButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(graphvizFitWidthButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.graphvizFitWidthButton.text")); // NOI18N
+        graphvizFitWidthButton.setFocusable(false);
+        graphvizFitWidthButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        graphvizFitWidthButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        graphvizFitWidthButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                graphvizFitWidthButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(graphvizFitWidthButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(graphvizFitHeightButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.graphvizFitHeightButton.text")); // NOI18N
+        graphvizFitHeightButton.setFocusable(false);
+        graphvizFitHeightButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        graphvizFitHeightButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        graphvizFitHeightButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                graphvizFitHeightButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(graphvizFitHeightButton);
 
         graphvizPanel.add(jToolBar1, java.awt.BorderLayout.PAGE_START);
 
@@ -262,7 +286,6 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 				ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
 				pngFileName = dotPngFile;
 //				icon.getImage().flush();
-				graphvizLabel.setIcon(icon);
 
 				preferWidth = graphvizLabel.getWidth() > icon.getIconWidth() ? icon.getIconWidth() : graphvizLabel.getWidth();
 				float ratio = ((float) preferWidth) / icon.getIconWidth();
@@ -270,6 +293,7 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 					ratio = 1;
 				}
 				preferHeight = (int) (icon.getIconHeight() * ratio);
+				graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
 
 				dotFile.delete();
 				dotPngFile.deleteOnExit();
@@ -343,18 +367,49 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
     private void searchAntlrTreeTextFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchAntlrTreeTextFieldKeyPressed
 		ModuleLib.log(evt.getKeyCode());
 		if (evt.getKeyCode() == 10) {
-			visibleNode(rootNode, false);
-			filterTreeNode(rootNode, searchAntlrTreeTextField.getText());
-			treeModel.reload();
+			treeModel.visibleNode(rootNode, false);
+			//treeModel.filterTreeNode(rootNode, searchAntlrTreeTextField.getText());
+			//antlrTree.updateUI();
+			treeModel.nodeStructureChanged(rootNode);
 			CommonLib.expandAll(antlrTree, true);
 		}
     }//GEN-LAST:event_searchAntlrTreeTextFieldKeyPressed
+
+    private void graphvizFitWidthButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_graphvizFitWidthButtonActionPerformed
+		if (pngFileName != null && pngFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngFileName.getAbsolutePath());
+			icon.getImage().flush();
+			preferWidth = graphvizLabel.getWidth() > icon.getIconWidth() ? icon.getIconWidth() : graphvizLabel.getWidth();
+			float ratio = ((float) preferWidth) / icon.getIconWidth();
+			if (ratio == 0) {
+				ratio = 1;
+			}
+			preferHeight = (int) (icon.getIconHeight() * ratio);
+			graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+		}
+    }//GEN-LAST:event_graphvizFitWidthButtonActionPerformed
+
+    private void graphvizFitHeightButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_graphvizFitHeightButtonActionPerformed
+		if (pngFileName != null && pngFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngFileName.getAbsolutePath());
+			icon.getImage().flush();
+			preferHeight = graphvizLabel.getHeight() > icon.getIconHeight() ? icon.getIconHeight() : graphvizLabel.getHeight();
+			float ratio = ((float) preferHeight) / icon.getIconHeight();
+			if (ratio == 0) {
+				ratio = 1;
+			}
+			preferWidth = (int) (icon.getIconWidth() * ratio);
+			graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+		}
+    }//GEN-LAST:event_graphvizFitHeightButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTree antlrTree;
     private javax.swing.JButton collapseTreeButton;
     private javax.swing.JButton expandTreeButton;
+    private javax.swing.JButton graphvizFitHeightButton;
+    private javax.swing.JButton graphvizFitWidthButton;
     private javax.swing.JLabel graphvizLabel;
     private javax.swing.JPanel graphvizPanel;
     private javax.swing.JScrollPane graphvizScrollPane;
@@ -370,32 +425,20 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
     private javax.swing.JButton zoomInButton;
     private javax.swing.JButton zoomOutButton;
     // End of variables declaration//GEN-END:variables
-	@Override
-	public void componentOpened() {
-		// TODO add custom code on component opening
-	}
-
-	@Override
-	public void componentClosed() {
-		// TODO add custom code on component closing
-	}
 
 	void writeProperties(java.util.Properties p) {
-		// better to version settings since initial version as advocated at
-		// http://wiki.apidesign.org/wiki/PropertyFiles
 		p.setProperty("version", "1.0");
-		// TODO store your settings
 	}
 
 	void readProperties(java.util.Properties p) {
 		String version = p.getProperty("version");
-		// TODO read your settings according to their version
 	}
 
 	@Override
 	public void resultChanged(LookupEvent le) {
 		Collection<? extends DataObject> dataObjects = result.allInstances();
-		for (DataObject d : dataObjects) {
+		if (dataObjects.size() > 0) {
+			DataObject d = (DataObject) dataObjects.toArray()[dataObjects.size() - 1];
 			if (d.getPrimaryFile().getExt().equals("g4")) {
 				lastDataObject = d;
 			}
@@ -406,25 +449,4 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 		return new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
 	}
 
-	private void visibleNode(AntlrTreeNode node, boolean b) {
-		rootNode.visible = b;
-		for (int x = 0; x < node.getChildCount(); x++) {
-			visibleNode((AntlrTreeNode) node.getChildAt(x), b);
-		}
-	}
-
-	private void filterTreeNode(AntlrTreeNode node, String text) {
-		if (node.text.toLowerCase().contains(text.toLowerCase())) {
-			ModuleLib.log("hit=" + node.text);
-			AntlrTreeNode nn = node;
-			do {
-				nn.visible = true;
-				nn = (AntlrTreeNode) nn.getParent();
-			} while (nn != null);
-		}
-
-		for (int x = 0; x < node.getChildCount(); x++) {
-			filterTreeNode((AntlrTreeNode) node.getChildAt(x), text);
-		}
-	}
 }

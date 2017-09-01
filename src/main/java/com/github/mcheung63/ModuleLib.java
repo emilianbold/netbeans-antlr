@@ -39,6 +39,17 @@ public class ModuleLib {
 		log(obj.toString());
 	}
 
+	public static void logNoNewLine(String str) {
+		if (isDebug) {
+			InputOutput io = IOProvider.getDefault().getIO("Antlr", false);
+			io.getOut().print(sdf.format(new Date()) + " - " + str);
+		}
+	}
+
+	public static void logNoNewLine(Object obj) {
+		log(obj.toString());
+	}
+
 	public static String printException(Exception ex) {
 		StringWriter errors = new StringWriter();
 		ex.printStackTrace(new PrintWriter(errors));
