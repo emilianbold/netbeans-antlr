@@ -8,25 +8,58 @@ import org.netbeans.lib.editor.hyperlink.spi.HyperlinkProvider;
 
 /**
  *
- * @author peter
+ * @author Peter <peter@quantr.hk>
  */
 @MimeRegistration(mimeType = "text/x-g4", service = HyperlinkProvider.class)
 public class Antlr4HyperlinkProvider implements HyperlinkProvider {
 
 	@Override
 	public boolean isHyperlinkPoint(Document dcmnt, int i) {
-		return true;
+		for (TokenDocumentLocation tokenDocumentLocation : MyANTLRv4ParserListener.ruleTokenDocumentLocationSources) {
+			//System.out.println(i + " ===> " + tokenDocumentLocation);
+			if (MyANTLRv4ParserListener.containTarget(tokenDocumentLocation.text) && tokenDocumentLocation.start <= i && i <= tokenDocumentLocation.stop) {
+				//System.out.println("good ===> " + tokenDocumentLocation);
+				return true;
+			} else {
+				//System.out.println("shit ===> " + tokenDocumentLocation);
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public int[] getHyperlinkSpan(Document dcmnt, int i) {
-		return new int[]{10, 20};
+		for (TokenDocumentLocation tokenDocumentLocation : MyANTLRv4ParserListener.ruleTokenDocumentLocationSources) {
+			if (tokenDocumentLocation.start <= i && i <= tokenDocumentLocation.stop) {
+				return new int[]{tokenDocumentLocation.start, tokenDocumentLocation.stop + 1};
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public void performClickAction(Document dcmnt, int i) {
-		 JTextComponent target = EditorRegistry.lastFocusedComponent();
-		 target.setCaretPosition(30);
+		JTextComponent jtextComponent = EditorRegistry.lastFocusedComponent();
+		String text = null;
+		for (TokenDocumentLocation tokenDocumentLocation : MyANTLRv4ParserListener.ruleTokenDocumentLocationSources) {
+			if (MyANTLRv4ParserListener.containTarget(tokenDocumentLocation.text)) {
+				if (tokenDocumentLocation.start <= i && i <= tokenDocumentLocation.stop) {
+					text = tokenDocumentLocation.text;
+					break;
+				}
+			}
+		}
+		System.out.println("text=" + text);
+		if (text != null) {
+			for (TokenDocumentLocation tokenDocumentLocation : MyANTLRv4ParserListener.ruleTokenDocumentLocationTargets) {
+				System.out.println("===" + tokenDocumentLocation.text);
+				if (tokenDocumentLocation.text.equals(text)) {
+					System.out.println("fuck=" + tokenDocumentLocation.start);
+					jtextComponent.setCaretPosition(tokenDocumentLocation.start);
+					return;
+				}
+			}
+		}
 	}
 
 }

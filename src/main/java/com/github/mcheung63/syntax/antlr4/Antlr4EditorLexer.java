@@ -1,24 +1,9 @@
-/*
- * Copyright (C) 2017 Peter (mcheung63@hotmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package com.github.mcheung63.syntax.antlr4;
 
-import com.github.mcheung63.ModuleLib;
+import com.github.mcheung63.TreeTopComponent;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
 import org.antlr.parser.antlr4.ANTLRv4Parser;
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.netbeans.api.lexer.Token;
@@ -35,14 +20,19 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 		AntlrCharStream charStream = new AntlrCharStream(info.input(), "Antlr4Editor");
 		lexer = new ANTLRv4Lexer(charStream);
 
-		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-		ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-		ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
-		ParseTreeWalker walker = new ParseTreeWalker();
-		MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-		walker.walk(listener, context);
-		
-		lexer.reset();
+		try {
+			if (TreeTopComponent.lastDataObject != null) {
+				ANTLRv4Lexer lexer2 = new ANTLRv4Lexer(new ANTLRInputStream(TreeTopComponent.lastDataObject.getPrimaryFile().getInputStream()));
+				CommonTokenStream tokenStream = new CommonTokenStream(lexer2);
+				ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
+				ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
+				ParseTreeWalker walker = new ParseTreeWalker();
+				MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
+				walker.walk(listener, context);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override

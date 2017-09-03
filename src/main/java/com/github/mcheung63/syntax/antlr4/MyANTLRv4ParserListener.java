@@ -2,7 +2,6 @@ package com.github.mcheung63.syntax.antlr4;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -23,7 +22,8 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 	Predicate<String> filter = x -> !x.isEmpty();
 	AstNode parentNode = null;
 
-	public static ArrayList<TokenDocumentLocation> ruleTokenDocumentLocations = new ArrayList<TokenDocumentLocation>();
+	public static ArrayList<TokenDocumentLocation> ruleTokenDocumentLocationTargets = new ArrayList<TokenDocumentLocation>();
+	public static ArrayList<TokenDocumentLocation> ruleTokenDocumentLocationSources = new ArrayList<TokenDocumentLocation>();
 
 	public MyANTLRv4ParserListener(Parser parser) {
 		ast = new Ast("root", "root");
@@ -37,14 +37,27 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 		String text = ctx.getText();
 		Token s = ctx.getStart();
 		Token e = ctx.getStop();
+
 		if (ruleName.equals("ruleSpec")) {
-			System.out.println("rule " + ruleName + " -- " + text);
-			if (s != null) {
-				System.out.println("\t" + s.getStartIndex() + ", " + s.getStopIndex() + ", " + s.getText());
-			}
-			if (e != null) {
-				System.out.println("\t\t" + e.getStartIndex() + ", " + e.getStopIndex() + ", " + e.getText());
-			}
+//			if (s != null) {
+//				System.out.println("\t" + s.getStartIndex() + ", " + s.getStopIndex() + ", " + s.getText());
+//			}
+//			if (e != null) {
+//				System.out.println("\t\t" + e.getStartIndex() + ", " + e.getStopIndex() + ", " + e.getText());
+//			}
+			TokenDocumentLocation tokenDocumentLocation = new TokenDocumentLocation();
+			tokenDocumentLocation.rule = ruleName;
+			tokenDocumentLocation.text = text.split(":")[0];
+			tokenDocumentLocation.start = s.getStartIndex();
+			tokenDocumentLocation.stop = s.getStopIndex();
+			ruleTokenDocumentLocationTargets.add(tokenDocumentLocation);
+		} else {
+			TokenDocumentLocation tokenDocumentLocation = new TokenDocumentLocation();
+			tokenDocumentLocation.rule = ruleName;
+			tokenDocumentLocation.text = text.split(":")[0];
+			tokenDocumentLocation.start = s.getStartIndex();
+			tokenDocumentLocation.stop = s.getStopIndex();
+			ruleTokenDocumentLocationSources.add(tokenDocumentLocation);
 		}
 		AstNode n = ast.newNode(parentNode, ruleName, text, s != null ? s.getStartIndex() : 0, e != null ? e.getStopIndex() : 0);
 		parentNode.addChild(n);
@@ -69,5 +82,14 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 				.map(Map.Entry::getKey)
 				.findFirst()
 				.orElse(null);
+	}
+
+	public static boolean containTarget(String text) {
+		for (TokenDocumentLocation tokenDocumentLocation : MyANTLRv4ParserListener.ruleTokenDocumentLocationTargets) {
+			if (tokenDocumentLocation.text.equals(text)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

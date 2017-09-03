@@ -32,7 +32,6 @@ import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
-import javax.swing.tree.DefaultTreeModel;
 import org.openide.util.Exceptions;
 
 /**
@@ -44,7 +43,7 @@ import org.openide.util.Exceptions;
 )
 @TopComponent.Description(
 		preferredID = "TreeTopComponent",
-		iconBase = "com/github/mcheung63/ruby.png",
+		iconBase = "com/github/mcheung63/antlr.png",
 		persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
@@ -62,7 +61,7 @@ import org.openide.util.Exceptions;
 public final class TreeTopComponent extends TopComponent implements LookupListener {
 
 	Lookup.Result<DataObject> result;
-	DataObject lastDataObject;
+	public static DataObject lastDataObject;
 	File pngFileName;
 	int preferWidth;
 	int preferHeight;

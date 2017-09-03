@@ -26,16 +26,16 @@ public class AntlrLib {
 //			}
 //		}
 
-		System.out.println("current=" + processLabel(node));
+		//System.out.println("current=" + processLabel(node));
 		for (int x = 0; x < node.getChildren().size(); x++) {
 			AstNode nextNode = node.getChild(x);
 
-			System.out.println("\tnextNode=" + processLabel(nextNode));
+			//System.out.println("\tnextNode=" + processLabel(nextNode));
 
 			String nextNodeLabel = processLabel(nextNode);
-			if (nextNodeLabel.equals("STRING")) {
-				System.out.println("break");
-			}
+//			if (nextNodeLabel.equals("STRING")) {
+//				System.out.println("break");
+//			}
 
 			if (nextNode.getChildrenSize() == 1) {
 				AstNode nextNextNode = nextNode.getChild(0);
@@ -52,7 +52,7 @@ public class AntlrLib {
 
 					nextNextNode = nextNextNode.getChild(0);
 				}
-				System.out.println("\t\tremove " + processLabel(node) + " -> " + processLabel(nextNextNode));
+				//System.out.println("\t\tremove " + processLabel(node) + " -> " + processLabel(nextNextNode));
 
 				node.getChildren().set(x, nextNextNode);
 			}
