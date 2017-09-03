@@ -18,6 +18,9 @@ package com.github.mcheung63.syntax.antlr4;
 
 import com.github.mcheung63.ModuleLib;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
+import org.antlr.parser.antlr4.ANTLRv4Parser;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerRestartInfo;
@@ -31,6 +34,15 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 		this.info = info;
 		AntlrCharStream charStream = new AntlrCharStream(info.input(), "Antlr4Editor");
 		lexer = new ANTLRv4Lexer(charStream);
+
+		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+		ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
+		ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
+		ParseTreeWalker walker = new ParseTreeWalker();
+		MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
+		walker.walk(listener, context);
+		
+		lexer.reset();
 	}
 
 	@Override
