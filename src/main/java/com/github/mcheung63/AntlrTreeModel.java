@@ -1,8 +1,6 @@
 package com.github.mcheung63;
 
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 public class AntlrTreeModel extends DefaultTreeModel {
 
