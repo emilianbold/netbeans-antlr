@@ -39,7 +39,6 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
 			ParseTreeWalker walker = new ParseTreeWalker();
 			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-			ModuleLib.log("clear");
 			MyANTLRv4ParserListener.ruleTokenDocumentLocationTargets.clear();
 			MyANTLRv4ParserListener.ruleTokenDocumentLocationSources.clear();
 			walker.walk(listener, context);

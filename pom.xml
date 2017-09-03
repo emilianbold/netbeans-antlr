@@ -266,16 +266,26 @@
 			<artifactId>org-netbeans-modules-editor-lib2</artifactId>
 			<version>RELEASE82</version>
 		</dependency>
-	 <dependency>
-	  <groupId>org.netbeans.api</groupId>
-	  <artifactId>org-netbeans-modules-editor-lib</artifactId>
-	  <version>RELEASE82</version>
-	  <type>jar</type>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.netbeans.api</groupId>
-	  <artifactId>org-netbeans-modules-editor</artifactId>
-	  <version>RELEASE82</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-modules-editor-lib</artifactId>
+			<version>RELEASE82</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-modules-editor</artifactId>
+			<version>RELEASE82</version>
+		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-modules-parsing-indexing</artifactId>
+			<version>RELEASE82</version>
+		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-modules-parsing-api</artifactId>
+			<version>RELEASE82</version>
+		</dependency>
 	</dependencies>
 </project>

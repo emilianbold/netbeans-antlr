@@ -14,6 +14,9 @@
 					<attr name="instanceCreate" methodvalue="com.github.mcheung63.syntax.antlr4.Antlr4TokenId.getLanguage"/>
 					<attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
 				</file>
+				<file name="g4.ErrorBadgingUpdater.instance">
+					<attr name="instanceClass" stringvalue="com.github.mcheung63.syntax.antlr4.ErrorBadgingUpdater$Factory"/>
+				</file>
 				<folder name="FontsColors">
 					<folder name="NetBeans">
 						<folder name="Defaults">
