@@ -49,12 +49,9 @@ public class Antlr4HyperlinkProvider implements HyperlinkProvider {
 				}
 			}
 		}
-		System.out.println("text=" + text);
 		if (text != null) {
 			for (TokenDocumentLocation tokenDocumentLocation : MyANTLRv4ParserListener.ruleTokenDocumentLocationTargets) {
-				System.out.println("===" + tokenDocumentLocation.text);
 				if (tokenDocumentLocation.text.equals(text)) {
-					System.out.println("fuck=" + tokenDocumentLocation.start);
 					jtextComponent.setCaretPosition(tokenDocumentLocation.start);
 					return;
 				}

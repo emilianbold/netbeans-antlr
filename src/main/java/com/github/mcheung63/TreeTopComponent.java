@@ -14,24 +14,23 @@ import java.awt.Image;
 import java.io.File;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import java.util.Collection;
 import javax.swing.ImageIcon;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
 import org.antlr.parser.antlr4.ANTLRv4Parser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.io.FileUtils;
+import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.loaders.DataObject;
-import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.Utilities;
 import org.openide.util.Exceptions;
 
 /**
@@ -58,10 +57,10 @@ import org.openide.util.Exceptions;
 	"CTL_TreeTopComponent=Tree Window",
 	"HINT_TreeTopComponent=This is a Tree window"
 })
-public final class TreeTopComponent extends TopComponent implements LookupListener {
+public final class TreeTopComponent extends TopComponent /*implements LookupListener*/ {
 
-	Lookup.Result<DataObject> result;
-	public static DataObject lastDataObject;
+//	Lookup.Result<DataObject> result;
+//	public static DataObject lastDataObject;
 	File pngFileName;
 	int preferWidth;
 	int preferHeight;
@@ -73,9 +72,8 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 		setName(Bundle.CTL_TreeTopComponent());
 		setToolTipText(Bundle.HINT_TreeTopComponent());
 
-		result = Utilities.actionsGlobalContext().lookupResult(DataObject.class);
-		result.addLookupListener(this);
-
+//		result = Utilities.actionsGlobalContext().lookupResult(DataObject.class);
+//		result.addLookupListener(this);
 		antlrTree.setModel(treeModel);
 		antlrTree.setCellRenderer(new AntlrTreeRenderer());
 		antlrTree.setShowsRootHandles(true);
@@ -247,56 +245,62 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
     private void refreshGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshGraphvizButtonActionPerformed
 		try {
-			if (lastDataObject != null) {
-//				String content = IOUtils.toString(lastDataObject.getPrimaryFile().getInputStream(), "UTF-8");
-				ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().getInputStream()));
-				CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-				ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-				ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
-				ParseTreeWalker walker = new ParseTreeWalker();
-				MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-				walker.walk(listener, context);
+			ANTLRv4Lexer lexer;
+			JTextComponent jTextComponent = EditorRegistry.focusedComponent();
+			if (jTextComponent != null) {
+				lexer = new ANTLRv4Lexer(new ANTLRInputStream(jTextComponent.getText()));
+			} else {
+				TopComponent activeTC = TopComponent.getRegistry().getActivated();
+				DataObject dataObject = activeTC.getLookup().lookup(DataObject.class);
+				lexer = new ANTLRv4Lexer(new ANTLRInputStream(dataObject.getPrimaryFile().getInputStream()));
+			}
+			
+			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
+			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
+			ParseTreeWalker walker = new ParseTreeWalker();
+			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
+			walker.walk(listener, context);
 
-				Ast ast = listener.ast;
-				AstNode root = ast.getRoot();
-				AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
-				AntlrLib.removeOneLeafNodes(root);
-				AntlrLib.printAst("", root);
+			Ast ast = listener.ast;
+			AstNode root = ast.getRoot();
+			AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
+			AntlrLib.removeOneLeafNodes(root);
+			AntlrLib.printAst("", root);
 
-				String dot = AntlrLib.exportDot(root);
+			String dot = AntlrLib.exportDot(root);
 
-				System.out.println(dot);
+			System.out.println(dot);
 
-				File dotFile = File.createTempFile("netbeans-antlr", ".dot");
-				File dotPngFile = File.createTempFile("netbeans-antlr", ".png");
-				FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
+			File dotFile = File.createTempFile("netbeans-antlr", ".dot");
+			File dotPngFile = File.createTempFile("netbeans-antlr", ".png");
+			FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
 //				MutableGraph g = Parser.read(dot);
 //				BufferedImage image = Graphviz.fromGraph(g).render(Format.PNG).toImage();
-				JProgressBarDialog d = new JProgressBarDialog("Generating dot...", true);
-				d.progressBar.setIndeterminate(true);
-				d.progressBar.setStringPainted(true);
-				d.progressBar.setString("running dot command : " + "dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
-				if (ModuleLib.isMac()) {
-					CommonLib.runCommand("/opt/local/bin/dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
-				} else {
-					CommonLib.runCommand("dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
-				}
-				Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
-				ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
-				pngFileName = dotPngFile;
+			JProgressBarDialog d = new JProgressBarDialog("Generating dot...", true);
+			d.progressBar.setIndeterminate(true);
+			d.progressBar.setStringPainted(true);
+			d.progressBar.setString("running dot command : " + "dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
+			if (ModuleLib.isMac()) {
+				CommonLib.runCommand("/opt/local/bin/dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
+			} else {
+				CommonLib.runCommand("dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
+			}
+			Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
+			ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
+			pngFileName = dotPngFile;
 //				icon.getImage().flush();
 
-				preferWidth = graphvizLabel.getWidth() > icon.getIconWidth() ? icon.getIconWidth() : graphvizLabel.getWidth();
-				float ratio = ((float) preferWidth) / icon.getIconWidth();
-				if (ratio == 0) {
-					ratio = 1;
-				}
-				preferHeight = (int) (icon.getIconHeight() * ratio);
-				graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
-
-				dotFile.delete();
-				dotPngFile.deleteOnExit();
+			preferWidth = graphvizLabel.getWidth() > icon.getIconWidth() ? icon.getIconWidth() : graphvizLabel.getWidth();
+			float ratio = ((float) preferWidth) / icon.getIconWidth();
+			if (ratio == 0) {
+				ratio = 1;
 			}
+			preferHeight = (int) (icon.getIconHeight() * ratio);
+			graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+
+			dotFile.delete();
+			dotPngFile.deleteOnExit();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -335,7 +339,15 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 
     private void refreshAntlrTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshAntlrTreeButtonActionPerformed
 		try {
-			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(lastDataObject.getPrimaryFile().getInputStream()));
+			ANTLRv4Lexer lexer;
+			JTextComponent jTextComponent = EditorRegistry.focusedComponent();
+			if (jTextComponent != null) {
+				lexer = new ANTLRv4Lexer(new ANTLRInputStream(jTextComponent.getText()));
+			} else {
+				TopComponent activeTC = TopComponent.getRegistry().getActivated();
+				DataObject dataObject = activeTC.getLookup().lookup(DataObject.class);
+				lexer = new ANTLRv4Lexer(new ANTLRInputStream(dataObject.getPrimaryFile().getInputStream()));
+			}
 			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
 			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
@@ -433,17 +445,16 @@ public final class TreeTopComponent extends TopComponent implements LookupListen
 		String version = p.getProperty("version");
 	}
 
-	@Override
-	public void resultChanged(LookupEvent le) {
-		Collection<? extends DataObject> dataObjects = result.allInstances();
-		if (dataObjects.size() > 0) {
-			DataObject d = (DataObject) dataObjects.toArray()[dataObjects.size() - 1];
-			if (d.getPrimaryFile().getExt().equals("g4")) {
-				lastDataObject = d;
-			}
-		}
-	}
-
+//	@Override
+//	public void resultChanged(LookupEvent le) {
+//		Collection<? extends DataObject> dataObjects = result.allInstances();
+//		if (dataObjects.size() > 0) {
+//			DataObject d = (DataObject) dataObjects.toArray()[dataObjects.size() - 1];
+//			if (d.getPrimaryFile().getExt().equals("g4")) {
+//				lastDataObject = d;
+//			}
+//		}
+//	}
 	ImageIcon resizeImage(ImageIcon icon, int width, int height) {
 		return new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
 	}

@@ -1,14 +1,18 @@
 package com.github.mcheung63.syntax.antlr4;
 
-import com.github.mcheung63.TreeTopComponent;
+import com.github.mcheung63.ModuleLib;
+import javax.swing.text.JTextComponent;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
 import org.antlr.parser.antlr4.ANTLRv4Parser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerRestartInfo;
+import org.openide.loaders.DataObject;
+import org.openide.windows.TopComponent;
 
 public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 
@@ -21,15 +25,38 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 		lexer = new ANTLRv4Lexer(charStream);
 
 		try {
-			if (TreeTopComponent.lastDataObject != null) {
-				ANTLRv4Lexer lexer2 = new ANTLRv4Lexer(new ANTLRInputStream(TreeTopComponent.lastDataObject.getPrimaryFile().getInputStream()));
-				CommonTokenStream tokenStream = new CommonTokenStream(lexer2);
-				ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-				ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
-				ParseTreeWalker walker = new ParseTreeWalker();
-				MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-				walker.walk(listener, context);
+			ANTLRv4Lexer lexer2;
+			JTextComponent jTextComponent = EditorRegistry.focusedComponent();
+			if (jTextComponent != null) {
+				lexer2 = new ANTLRv4Lexer(new ANTLRInputStream(jTextComponent.getText()));
+			} else {
+				TopComponent activeTC = TopComponent.getRegistry().getActivated();
+				DataObject dataObject = activeTC.getLookup().lookup(DataObject.class);
+				lexer2 = new ANTLRv4Lexer(new ANTLRInputStream(dataObject.getPrimaryFile().getInputStream()));
 			}
+			CommonTokenStream tokenStream = new CommonTokenStream(lexer2);
+			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
+			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
+			ParseTreeWalker walker = new ParseTreeWalker();
+			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
+			ModuleLib.log("clear");
+			MyANTLRv4ParserListener.ruleTokenDocumentLocationTargets.clear();
+			MyANTLRv4ParserListener.ruleTokenDocumentLocationSources.clear();
+			walker.walk(listener, context);
+
+//			DataObject.Registry registries = DataObject.getRegistry();
+//			DataObject[] objects = registries.getModified();
+//			for (int i = 0; i < objects.length; i++) {
+//				DataObject dataObj = objects[i];
+//				ModuleLib.log("data object name = " + dataObj.getName());
+//				ModuleLib.log("data object pimary file name = " + dataObj.getPrimaryFile().getName());
+//				Set fss = dataObj.files();
+//				Iterator iter = fss.iterator();
+//				while (iter.hasNext()) {
+//					FileObject fo = (FileObject) iter.next();
+//					ModuleLib.log("\tset file object: " + fo.getName());
+//				}
+//			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
