@@ -68,11 +68,11 @@ public class ErrorBadgingUpdater extends EmbeddingIndexer {
 			ModuleLib.log("+++++++++++ Factory createIndexer " + indxbl.getMimeType());
 			System.out.println("+++++++++++ Factory createIndexer " + indxbl.getMimeType());
 			EmbeddingIndexer answer;
-			if (indxbl.getMimeType().equals(MIME)) {
+//			if (indxbl.getMimeType().equals(MIME)) {
 				answer = new ErrorBadgingUpdater();
-			} else {
-				answer = null;
-			}
+//			} else {
+//				answer = null;
+//			}
 			return answer;
 		}
 
