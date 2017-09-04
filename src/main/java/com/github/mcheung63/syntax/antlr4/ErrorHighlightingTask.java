@@ -1,19 +1,28 @@
 package com.github.mcheung63.syntax.antlr4;
 
 import com.github.mcheung63.ModuleLib;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.text.Document;
+import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
+import org.netbeans.spi.editor.hints.ErrorDescription;
+import org.netbeans.spi.editor.hints.HintsController;
 
 /**
  *
  * @author Peter <peter@quantr.hk>
  */
-public class ErrorHighlightingTask extends ParserResultTask<ParserResult> {
+public class ErrorHighlightingTask extends ParserResultTask {
 
 	@Override
-	public void run(ParserResult result, SchedulerEvent event) {
+	public void run(Result result, SchedulerEvent event) {
 		ModuleLib.log("ErrorHighlightingTask run");
+		Document document = result.getSnapshot().getSource().getDocument(false);
+		List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
+		HintsController.setErrors(document, "simple-antlr-error", errors);
 //            List<ParsingError> errors = result.getDiagnostics();
 //            List<ErrorDescription> errDescList = new ArrayList<ErrorDescription> ();
 //            if(errors!=null){
@@ -46,7 +55,7 @@ public class ErrorHighlightingTask extends ParserResultTask<ParserResult> {
 
 	@Override
 	public int getPriority() {
-		return 50;
+		return 100;
 	}
 
 	@Override
