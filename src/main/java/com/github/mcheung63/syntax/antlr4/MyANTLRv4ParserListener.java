@@ -72,7 +72,6 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 
 	@Override
 	public void enterGrammarSpec(ANTLRv4Parser.GrammarSpecContext ctx) {
-		System.out.println("\t\t\t\t\tenterGrammarSpec=" + ctx.identifier().getText());
 		ast.getRoot().setLabel(ctx.identifier().getText());
 	}
 
