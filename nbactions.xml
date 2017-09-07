@@ -9,9 +9,6 @@
                 <goal>nbm:cluster</goal>
                 <goal>nbm:run-ide</goal>
             </goals>
-            <properties>
-                <netbeans.installation>/Applications/NetBeans/NetBeans 8.2.app/Contents/Resources/NetBeans/</netbeans.installation>
-            </properties>
         </action>
         <action>
             <actionName>build</actionName>
