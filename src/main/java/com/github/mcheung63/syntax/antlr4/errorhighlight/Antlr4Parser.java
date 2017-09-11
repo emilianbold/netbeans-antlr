@@ -36,8 +36,8 @@ public class Antlr4Parser extends Parser {
 		ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
 		parser.addErrorListener(new ANTLRErrorListener() {
 			@Override
-			public void syntaxError(Recognizer<?, ?> rcgnzr, Object o, int i, int i1, String string, RecognitionException re) {
-				ModuleLib.log("error " + rcgnzr + ", " + i + ", " + i1 + ", " + string + ", " + re);
+			public void syntaxError(Recognizer<?, ?> rcgnzr, Object o, int lineNumber, int charOffsetFromLine, String string, RecognitionException re) {
+				ModuleLib.log("error " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + string + ", " + re);
 			}
 
 			@Override

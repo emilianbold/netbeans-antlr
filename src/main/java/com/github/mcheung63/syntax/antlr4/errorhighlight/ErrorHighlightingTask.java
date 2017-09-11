@@ -21,9 +21,6 @@ public class ErrorHighlightingTask extends ParserResultTask {
 
 	@Override
 	public void run(Result result, SchedulerEvent event) {
-		ModuleLib.log("ErrorHighlightingTask run");
-		System.out.println(" ---------------------------- ErrorHighlightingTask run");
-
 		try {
 			Document document = result.getSnapshot().getSource().getDocument(false);
 			List<ErrorDescription> errors = new ArrayList<>();

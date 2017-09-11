@@ -15,7 +15,7 @@
 					<attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
 				</file>
 				<file name="com-github-mcheung63-syntax-antlr4-ErrorHighlightingTaskFactory.instance"/>
-				<file name="com-github-mcheung63-syntax-antlr4--errorhighlight-Antlr4ParserFactory.instance"/>
+				<file name="com-github-mcheung63-syntax-antlr4-errorhighlight-Antlr4ParserFactory.instance"/>
 				<folder name="FontsColors">
 					<folder name="NetBeans">
 						<folder name="Defaults">
