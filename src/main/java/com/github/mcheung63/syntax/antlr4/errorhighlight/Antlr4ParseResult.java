@@ -1,4 +1,4 @@
-package com.github.mcheung63.syntax.antlr4;
+package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.netbeans.modules.parsing.spi.Parser.Result;

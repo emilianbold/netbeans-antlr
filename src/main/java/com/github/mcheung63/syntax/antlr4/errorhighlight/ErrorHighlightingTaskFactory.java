@@ -1,4 +1,4 @@
-package com.github.mcheung63.syntax.antlr4;
+package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
 import com.github.mcheung63.ModuleLib;
 import java.util.Collection;
