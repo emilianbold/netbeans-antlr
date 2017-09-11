@@ -17,7 +17,6 @@ public class ErrorHighlightingTaskFactory extends TaskFactory {
 
 	@Override
 	public Collection<? extends SchedulerTask> create(Snapshot snapshot) {
-		ModuleLib.log("ErrorHighlightingTaskFactory create");
 		return Collections.singleton(new ErrorHighlightingTask());
 	}
 

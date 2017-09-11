@@ -19,19 +19,23 @@ import org.netbeans.spi.editor.hints.Severity;
  */
 public class ErrorHighlightingTask extends ParserResultTask {
 
+	public static ArrayList<ErrorInfo> errorInfos = new ArrayList<>();
+
 	@Override
 	public void run(Result result, SchedulerEvent event) {
 		try {
 			Document document = result.getSnapshot().getSource().getDocument(false);
-			List<ErrorDescription> errors = new ArrayList<>();
-			ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
-					Severity.ERROR,
-					"fuck error 1",
-					document,
-					document.createPosition(0),
-					document.createPosition(5)
-			);
-			errors.add(errorDescription);
+			ArrayList<ErrorDescription> errors = new ArrayList<>();
+			for (ErrorInfo errorInfo : errorInfos) {
+				ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
+						Severity.ERROR,
+						errorInfo.message,
+						document,
+						document.createPosition(errorInfo.offsetStart),
+						document.createPosition(errorInfo.offsetEnd + 1)
+				);
+				errors.add(errorDescription);
+			}
 			HintsController.setErrors(document, "simple-antlr-error", errors);
 		} catch (Exception ex) {
 			ex.printStackTrace();
