@@ -34,10 +34,10 @@ public class Antlr4Parser extends Parser {
 		ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(snapshot.getText().toString()));
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-		parser.addErrorListener(new ANTLRErrorListener(){
+		parser.addErrorListener(new ANTLRErrorListener() {
 			@Override
 			public void syntaxError(Recognizer<?, ?> rcgnzr, Object o, int i, int i1, String string, RecognitionException re) {
-				ModuleLib.log("error "+i+", "+i1);
+				ModuleLib.log("error " + rcgnzr + ", " + i + ", " + i1 + ", " + string + ", " + re);
 			}
 
 			@Override
