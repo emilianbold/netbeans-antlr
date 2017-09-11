@@ -40,34 +40,6 @@ public class ErrorHighlightingTask extends ParserResultTask {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-//            List<ParsingError> errors = result.getDiagnostics();
-//            List<ErrorDescription> errDescList = new ArrayList<ErrorDescription> ();
-//            if(errors!=null){
-//                Document doc = result.getSnapshot().getSource().getDocument(false);
-//                for(KalangError e:errors){
-////                    String excepted = e.getExpectedTokens().toString(KalangParser.VOCABULARY);
-////                    Token errTk = e.getOffendingToken();
-////                    String msg = errTk.getText() + " is unexcepted ,excepted " + excepted;
-////                    int start = errTk.getStartIndex();
-////                    int stop = errTk.getStopIndex();
-//                    String msg = e.getDescription();
-//                    int start = e.getStartPosition();
-//                    int stop = e.getEndPosition();
-//                    try{
-//                        ErrorDescription errorDesc = ErrorDescriptionFactory.createErrorDescription(
-//                            Severity.ERROR,
-//                            msg,
-//                            doc,
-//                            doc.createPosition(start),
-//                            doc.createPosition(stop)
-//                        );
-//                        errDescList.add(errorDesc);
-//                    } catch (BadLocationException ex) {
-//                        Exceptions.printStackTrace(ex);
-//                    }
-//                }
-//                HintsController.setErrors (doc, "kalang", errDescList);
-//            }
 	}
 
 	@Override
