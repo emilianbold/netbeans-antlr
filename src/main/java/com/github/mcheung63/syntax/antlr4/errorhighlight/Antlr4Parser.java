@@ -1,5 +1,6 @@
 package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
+import com.github.mcheung63.ModuleLib;
 import com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener;
 import java.util.BitSet;
 import javax.swing.event.ChangeListener;
@@ -36,6 +37,7 @@ public class Antlr4Parser extends Parser {
 		parser.addErrorListener(new ANTLRErrorListener(){
 			@Override
 			public void syntaxError(Recognizer<?, ?> rcgnzr, Object o, int i, int i1, String string, RecognitionException re) {
+				ModuleLib.log("error "+i+", "+i1);
 			}
 
 			@Override
