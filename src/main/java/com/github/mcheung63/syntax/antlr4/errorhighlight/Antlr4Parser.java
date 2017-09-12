@@ -40,7 +40,7 @@ public class Antlr4Parser extends Parser {
 		parser.addErrorListener(new ANTLRErrorListener() {
 			@Override
 			public void syntaxError(Recognizer<?, ?> rcgnzr, Object offendingSymbol, int lineNumber, int charOffsetFromLine, String message, RecognitionException re) {
-				ModuleLib.log("error " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + message + ", " + re);
+				//ModuleLib.log("error " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + message + ", " + re);
 				
 				Token offendingToken = (Token) offendingSymbol;
 				int start = offendingToken.getStartIndex() + snapshot.getOriginalOffset(0);
