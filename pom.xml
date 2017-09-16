@@ -276,6 +276,7 @@
 			<groupId>org.netbeans.api</groupId>
 			<artifactId>org-netbeans-modules-editor</artifactId>
 			<version>RELEASE82</version>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.netbeans.api</groupId>

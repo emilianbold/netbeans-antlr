@@ -25,6 +25,15 @@
 						</folder>
 					</folder>
 				</folder>
+				
+				<folder name="Toolbars"> 
+					<folder name="Default"> 
+						<file name="com-github-mcheung63-syntax-antlr4-ChooseRealTimecompileFileAction.instance"> 
+<!--							<attr name="instanceClass" stringvalue="ChooseRealTimecompileFileAction"/>-->
+						</file> 
+					</folder> 
+				</folder> 
+				
 			</folder>
 		</folder>
 	</folder>

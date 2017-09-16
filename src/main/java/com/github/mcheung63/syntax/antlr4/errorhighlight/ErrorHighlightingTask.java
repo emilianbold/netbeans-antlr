@@ -1,12 +1,12 @@
 package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
 import com.github.mcheung63.FileTypeG4DataObject;
-import com.github.mcheung63.FileTypeG4VisualElement;
 import com.github.mcheung63.ModuleLib;
 import java.util.ArrayList;
+import javax.swing.JComponent;
+import javax.swing.JToolBar;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeLookup;
-import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
@@ -44,7 +44,10 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			HintsController.setErrors(document, "simple-antlr-error", errors);
 
 			TopComponent topComponent = TopComponent.getRegistry().getActivated();
+			//print(topComponent, "\t");
 			ModuleLib.log("real time compile 1 " + topComponent.getLookup().lookup(FileTypeG4DataObject.class));
+			ModuleLib.log("real time compile 1.1 " + topComponent.getLookup().lookup(JToolBar.class));
+			
 			ModuleLib.log("real time compile 2 " + MimeLookup.getDefault().lookup(MultiViewElement.class));
 //			for (int x = 0; x < MultiViews.findMultiViewHandler(topComponent).getPerspectives().length; x++) {
 //				ModuleLib.log("\t" + x + " real time compile 3 " + MultiViews.findMultiViewHandler(topComponent).getPerspectives()[x]);
@@ -66,6 +69,13 @@ public class ErrorHighlightingTask extends ParserResultTask {
 
 	@Override
 	public void cancel() {
+	}
+
+	private void print(JComponent component, String str) {
+		ModuleLib.log(str + component);
+		for (int x = 0; x < component.getComponentCount(); x++) {
+			print((JComponent) component.getComponent(x), str + "\t");
+		}
 	}
 
 }
