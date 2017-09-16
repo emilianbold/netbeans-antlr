@@ -1,17 +1,20 @@
 package com.github.mcheung63;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
-import org.openide.util.Exceptions;
+import org.openide.cookies.EditorCookie;
+import org.openide.loaders.DataObject;
+import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -24,7 +27,7 @@ import org.openide.windows.TopComponent;
 		preferredID = "FileTypeG4Visual",
 		position = 2000
 )
-@Messages("LBL_FileTypeG4_VISUAL=Visual")
+@Messages("LBL_FileTypeG4_VISUAL=Settings")
 public final class FileTypeG4VisualElement extends JPanel implements MultiViewElement {
 
 	private FileTypeG4DataObject obj;
@@ -58,6 +61,10 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
+        settingPanel = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        realTimeFileComboBox = new javax.swing.JComboBox<>();
+        refreshRealTimeFileButton = new javax.swing.JButton();
         treePanel = new javax.swing.JPanel();
         refreshTreeButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -66,7 +73,49 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         jLabel1 = new javax.swing.JLabel();
         startRuleTextField = new javax.swing.JTextField();
 
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
         setLayout(new java.awt.BorderLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel2.text")); // NOI18N
+
+        realTimeFileComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        org.openide.awt.Mnemonics.setLocalizedText(refreshRealTimeFileButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshRealTimeFileButton.text")); // NOI18N
+        refreshRealTimeFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshRealTimeFileButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout settingPanelLayout = new javax.swing.GroupLayout(settingPanel);
+        settingPanel.setLayout(settingPanelLayout);
+        settingPanelLayout.setHorizontalGroup(
+            settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(settingPanelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(realTimeFileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(refreshRealTimeFileButton)
+                .addContainerGap(282, Short.MAX_VALUE))
+        );
+        settingPanelLayout.setVerticalGroup(
+            settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(settingPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(realTimeFileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(refreshRealTimeFileButton))
+                .addContainerGap(679, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.settingPanel.TabConstraints.tabTitle"), settingPanel); // NOI18N
 
         refreshTreeButton.setLabel(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshTreeButton.label")); // NOI18N
         refreshTreeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -232,10 +281,9 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 		} catch (Exception ex) {
 			ModuleLib.log(ex.getMessage());
 		}
-		*/
-		
+		 */
 		try {
-/*
+			/*
 			File file = new File(obj.getPrimaryFile().getPath());
 			ModuleLib.log("file=" + file.getAbsolutePath());
 			String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
@@ -243,7 +291,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 			DefaultTreeListener treeListener = new DefaultTreeListener();
 			gp.setListener(treeListener);
 			gp.compile();
-*/
+			 */
 
 //			MemoryTupleSet set = gp.getAllCompiledObjects();
 //			for (MemoryTuple tup : set) {
@@ -261,7 +309,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 //				}
 //			}
 
-/*
+			/*
 			ParserRuleContext ctx = gp.parse("1+2*(3+4)");
 			Ast ast = treeListener.getAst();
 			List<AstNode> nodes = ast.getNodes();
@@ -269,7 +317,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 				loop("", n);
 			}
 			ModuleLib.log(ast.toDot());
-*/
+			 */
 		} catch (Exception ex) {
 			ModuleLib.log(ex.getMessage());
 		}
@@ -337,8 +385,8 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 			System.err.println("No method for rule " + startRuleName + " or it has arguments");
 		}
 	}
-	*/
-	
+	 */
+
     private void browseTestFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseTestFileButtonActionPerformed
 //		final JFileChooser fc = new JFileChooser();
 //		int returnVal = fc.showOpenDialog(null);
@@ -354,14 +402,43 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 //		}
     }//GEN-LAST:event_browseTestFileButtonActionPerformed
 
+    private void refreshRealTimeFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshRealTimeFileButtonActionPerformed
+		realTimeFileComboBox.removeAllItems();;
+
+		Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
+		ArrayList<String> temp = new ArrayList<>();
+		for (TopComponent tc : comps) {
+			Node[] arr = tc.getActivatedNodes();
+			if (arr != null) {
+				for (int j = 0; j < arr.length; j++) {
+					DataObject dataObject = (DataObject) arr[j].getCookie(DataObject.class);
+					File file = new File(dataObject.getPrimaryFile().getPath());
+					if (file.exists() && file.isFile() && !temp.contains(file.getName())) {
+						realTimeFileComboBox.addItem(file.getName());
+						temp.add(file.getName());
+					}
+				}
+			}
+		}
+
+    }//GEN-LAST:event_refreshRealTimeFileButtonActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+		refreshRealTimeFileButtonActionPerformed(null);
+    }//GEN-LAST:event_formComponentShown
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseTestFileButton;
     private javax.swing.JTextArea contentTextArea;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JComboBox<String> realTimeFileComboBox;
+    private javax.swing.JButton refreshRealTimeFileButton;
     private javax.swing.JButton refreshTreeButton;
+    private javax.swing.JPanel settingPanel;
     private javax.swing.JTextField startRuleTextField;
     private javax.swing.JPanel treePanel;
     // End of variables declaration//GEN-END:variables
