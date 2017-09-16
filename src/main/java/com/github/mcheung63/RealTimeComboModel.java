@@ -1,24 +1,26 @@
 package com.github.mcheung63;
 
 import java.io.File;
-import java.util.TreeSet;
-import javax.swing.AbstractListModel;
+import java.util.ArrayList;
 import javax.swing.ComboBoxModel;
+import javax.swing.event.ListDataListener;
 
 /**
  *
  * @author Peter <peter@quantr.hk>
  */
-public class RealTimeComboModel extends AbstractListModel implements ComboBoxModel {
+public class RealTimeComboModel implements ComboBoxModel {
 
-	public TreeSet<File> files = new TreeSet<>();
+	public ArrayList<File> files = new ArrayList<>();
 
 	File selection = null;
 
+	@Override
 	public Object getElementAt(int index) {
 		return files.toArray()[index];
 	}
 
+	@Override
 	public int getSize() {
 		return files.size();
 	}
@@ -31,6 +33,14 @@ public class RealTimeComboModel extends AbstractListModel implements ComboBoxMod
 	@Override
 	public Object getSelectedItem() {
 		return selection;
+	}
+
+	@Override
+	public void addListDataListener(ListDataListener l) {
+	}
+
+	@Override
+	public void removeListDataListener(ListDataListener l) {
 	}
 
 }
