@@ -4,10 +4,14 @@ import com.github.mcheung63.ModuleLib;
 import com.github.mcheung63.RealTimeComboModel;
 import com.github.mcheung63.RealTimeComboRenderer;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Set;
-import javax.swing.JEditorPane;
-import org.netbeans.core.spi.multiview.MultiViewFactory;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import org.netbeans.api.editor.EditorRegistry;
+import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.windows.TopComponent;
@@ -17,16 +21,18 @@ import org.openide.windows.TopComponent;
  * @author Peter <peter@quantr.hk>
  */
 public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
-
+	
+	public static HashMap<DataObject, File> maps = new HashMap<>();
+	
 	RealTimeComboModel realTimeComboModel = new RealTimeComboModel();
-
+	
 	public ChooseRealTimecompileFilePanel() {
 		initComponents();
 		initComboBox();
 		setMaximumSize(new Dimension(300, 25));
 		setPreferredSize(new Dimension(300, 25));
 	}
-
+	
 	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -38,6 +44,11 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 
         comboBox.setModel(realTimeComboModel);
         comboBox.setRenderer(new RealTimeComboRenderer());
+        comboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                comboBoxItemStateChanged(evt);
+            }
+        });
         comboBox.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
                 comboBoxComponentShown(evt);
@@ -63,6 +74,17 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 		initComboBox();
     }//GEN-LAST:event_refreshButtonActionPerformed
 
+    private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBoxItemStateChanged
+		if (evt.getStateChange() == ItemEvent.SELECTED) {
+			File file = (File) evt.getItem();
+			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
+			ModuleLib.log("jTextComponent=" + jTextComponent);
+			Document document = jTextComponent.getDocument();
+			DataObject dataObject = NbEditorUtilities.getDataObject(document);
+			maps.put(dataObject, file);
+		}
+    }//GEN-LAST:event_comboBoxItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> comboBox;
@@ -72,7 +94,7 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 	private void initComboBox() {
 		synchronized (realTimeComboModel.files) {
 			realTimeComboModel.files.clear();
-
+			
 			Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
 			for (TopComponent tc : comps) {
 				Node[] arr = tc.getActivatedNodes();
@@ -88,7 +110,7 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 //			}
 			}
 		}
-
+		
 		comboBox.setRenderer(new RealTimeComboRenderer()); // if no this line, combobox will show nothing after refeshing with few files
 	}
 }
