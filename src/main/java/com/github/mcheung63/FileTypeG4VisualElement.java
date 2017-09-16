@@ -1,18 +1,15 @@
 package com.github.mcheung63;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
-import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
@@ -42,6 +39,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 	boolean trace = true;
 	boolean printTree = true;
 	String psFile = null;
+	RealTimeComboModel realTimeComboModel = new RealTimeComboModel();
 
 	public FileTypeG4VisualElement(Lookup lkp) {
 		obj = lkp.lookup(FileTypeG4DataObject.class);
@@ -73,16 +71,11 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         jLabel1 = new javax.swing.JLabel();
         startRuleTextField = new javax.swing.JTextField();
 
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentShown(java.awt.event.ComponentEvent evt) {
-                formComponentShown(evt);
-            }
-        });
         setLayout(new java.awt.BorderLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel2.text")); // NOI18N
 
-        realTimeFileComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        realTimeFileComboBox.setModel(realTimeComboModel);
 
         org.openide.awt.Mnemonics.setLocalizedText(refreshRealTimeFileButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshRealTimeFileButton.text")); // NOI18N
         refreshRealTimeFileButton.addActionListener(new java.awt.event.ActionListener() {
@@ -403,29 +396,25 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
     }//GEN-LAST:event_browseTestFileButtonActionPerformed
 
     private void refreshRealTimeFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshRealTimeFileButtonActionPerformed
-		realTimeFileComboBox.removeAllItems();;
+		realTimeComboModel.files.clear();
 
 		Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
-		ArrayList<String> temp = new ArrayList<>();
+//		ArrayList<String> temp = new ArrayList<>();
 		for (TopComponent tc : comps) {
 			Node[] arr = tc.getActivatedNodes();
 			if (arr != null) {
 				for (int j = 0; j < arr.length; j++) {
 					DataObject dataObject = (DataObject) arr[j].getCookie(DataObject.class);
 					File file = new File(dataObject.getPrimaryFile().getPath());
-					if (file.exists() && file.isFile() && !temp.contains(file.getName())) {
-						realTimeFileComboBox.addItem(file.getName());
-						temp.add(file.getName());
+					if (file.exists() && file.isFile()/* && !temp.contains(file.getName())*/) {
+						realTimeComboModel.files.add(file);
+//						temp.add(file.getName());
 					}
 				}
 			}
 		}
 
     }//GEN-LAST:event_refreshRealTimeFileButtonActionPerformed
-
-    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-		refreshRealTimeFileButtonActionPerformed(null);
-    }//GEN-LAST:event_formComponentShown
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -473,6 +462,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 
 	@Override
 	public void componentShowing() {
+		refreshRealTimeFileButtonActionPerformed(null);
 	}
 
 	@Override

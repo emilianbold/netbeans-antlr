@@ -287,10 +287,15 @@
 			<artifactId>org-netbeans-modules-parsing-api</artifactId>
 			<version>RELEASE82</version>
 		</dependency>
-	 <dependency>
-	  <groupId>org.netbeans.api</groupId>
-	  <artifactId>org-netbeans-spi-editor-hints</artifactId>
-	  <version>RELEASE82</version>
-	 </dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-spi-editor-hints</artifactId>
+			<version>RELEASE82</version>
+		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-netbeans-modules-editor-mimelookup</artifactId>
+			<version>RELEASE82</version>
+		</dependency>
 	</dependencies>
 </project>

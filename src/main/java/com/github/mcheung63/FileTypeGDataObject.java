@@ -115,6 +115,7 @@ public class FileTypeGDataObject extends MultiDataObject {
 			preferredID = "FileTypeG",
 			position = 1000
 	)
+
 	@Messages("LBL_FileTypeG_EDITOR=Source")
 	public static MultiViewEditorElement createEditor(Lookup lkp) {
 		return new MultiViewEditorElement(lkp);
