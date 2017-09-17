@@ -10,10 +10,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import javax.swing.JComponent;
+import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -32,6 +39,8 @@ import org.netbeans.api.editor.EditorRegistry;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.modules.editor.NbEditorUtilities;
+import org.netbeans.modules.editor.lib2.highlighting.HighlightingManager;
+import static org.netbeans.modules.editor.lib2.view.EditorViewFactory.factories;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
@@ -138,9 +147,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 
 				BaseErrorListener printError = new BaseErrorListener() {
 					@Override
-					public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol,
-							final int line, final int position, final String msg,
-							final RecognitionException e) {
+					public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol, final int line, final int position, final String msg, final RecognitionException e) {
 						ModuleLib.log("ERROR :" + line + ":" + position + ": " + msg);
 					}
 				};
@@ -155,10 +162,11 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 			}
 
-//			Highlighter highlighter = jTextComponent.getHighlighter();
-//			HighlightPainter highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN);
-//			highlighter.addHighlight(5, 10, highlightPainter);
+			Highlighter highlighter = jTextComponent.getHighlighter();
+			HighlightPainter highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN);
+			highlighter.addHighlight(5, 10, highlightPainter);
 //			jTextComponent.repaint();
+
 			EditorCookie ec = dataObject.getLookup().lookup(EditorCookie.class);
 			Document doc2 = ec.getDocument();
 			OffsetsBag bag = new OffsetsBag(doc2, true);
@@ -166,8 +174,14 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			bag.addHighlight(5, 10, defaultColors);
 			AttributeSet defaultColors2 = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 255, 255));
 			bag.addHighlight(2, 5, defaultColors2);
-//			getBag(doc).setHighlights(bag);
 
+			StyleContext sc = StyleContext.getDefaultStyleContext();
+			AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.blue);
+			aset = sc.addAttribute(aset, StyleConstants.Background, Color.red);
+			((JTextPane)jTextComponent).setCharacterAttributes(aset, true);
+			
+
+//			getBag(doc).setHighlights(bag);
 //			ArrayList<Lookup> lookups = new ArrayList<Lookup>();
 //			for (MimePath mimePath : mimePaths) {
 //				lookups.add(MimeLookup.getLookup(mimePath));
@@ -185,6 +199,8 @@ public class ErrorHighlightingTask extends ParserResultTask {
 		} catch (FileNotFoundException ex) {
 			Exceptions.printStackTrace(ex);
 		} catch (IOException ex) {
+			Exceptions.printStackTrace(ex);
+		} catch (BadLocationException ex) {
 			Exceptions.printStackTrace(ex);
 		}
 	}
