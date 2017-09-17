@@ -72,7 +72,9 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 
 	@Override
 	public void enterGrammarSpec(ANTLRv4Parser.GrammarSpecContext ctx) {
-		ast.getRoot().setLabel(ctx.identifier().getText());
+		if (ast != null && ast.getRoot() != null && ctx != null) {
+			ast.getRoot().setLabel(ctx.identifier().getText());
+		}
 	}
 
 	public String getRuleByKey(int key) {

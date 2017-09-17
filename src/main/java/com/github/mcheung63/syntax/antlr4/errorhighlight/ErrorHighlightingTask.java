@@ -2,14 +2,18 @@ package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
 import com.github.mcheung63.ModuleLib;
 import com.github.mcheung63.syntax.antlr4.ChooseRealTimecompileFilePanel;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import javax.swing.JComponent;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.StyleConstants;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -26,17 +30,23 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.netbeans.api.editor.EditorRegistry;
 import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
+import org.netbeans.spi.editor.highlighting.HighlightsLayerFactory;
+import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
+import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -113,8 +123,8 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			if (ast.grammarType == ANTLRParser.COMBINED) {
 				Grammar grammar = tool.createGrammar(ast);
 				tool.process(grammar, false);
-				ModuleLib.log("grammar=" + grammar);
-				ModuleLib.log("tool=" + tool);
+				System.out.println("grammar=" + grammar);
+				System.out.println("tool=" + tool);
 
 				for (String rule : grammar.getRuleNames()) {
 					ModuleLib.log("rule=" + rule);
@@ -143,39 +153,35 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				Rule start = grammar.getRule(startRule);
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
 				ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
-
 			}
 
-//			ANTLRv4Lexer lexer = new ANTLRv4Lexer(new ANTLRInputStream(jTextComponent.getText()));
-//			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-//			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-//			parser.addErrorListener(new ANTLRErrorListener() {
-//				@Override
-//				public void syntaxError(Recognizer<?, ?> rcgnzr, Object offendingSymbol, int lineNumber, int charOffsetFromLine, String message, RecognitionException re) {
-//					//ModuleLib.log("error " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + message + ", " + re);
-//
-//					Token offendingToken = (Token) offendingSymbol;
-//					int start = offendingToken.getStartIndex();
-//					int stop = offendingToken.getStopIndex();
-//					ModuleLib.log(" oh yeah " + start + ", " + stop + " = " + message + ", token=" + offendingToken);
-//				}
-//
-//				@Override
-//				public void reportAmbiguity(org.antlr.v4.runtime.Parser parser, DFA dfa, int i, int i1, boolean bln, BitSet bitset, ATNConfigSet atncs) {
-//				}
-//
-//				@Override
-//				public void reportAttemptingFullContext(org.antlr.v4.runtime.Parser parser, DFA dfa, int i, int i1, BitSet bitset, ATNConfigSet atncs) {
-//				}
-//
-//				@Override
-//				public void reportContextSensitivity(org.antlr.v4.runtime.Parser parser, DFA dfa, int i, int i1, int i2, ATNConfigSet atncs) {
-//				}
-//			});
-//			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
-//			ParseTreeWalker walker = new ParseTreeWalker();
-//			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-//			walker.walk(listener, context);
+//			Highlighter highlighter = jTextComponent.getHighlighter();
+//			HighlightPainter highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN);
+//			highlighter.addHighlight(5, 10, highlightPainter);
+//			jTextComponent.repaint();
+			EditorCookie ec = dataObject.getLookup().lookup(EditorCookie.class);
+			Document doc2 = ec.getDocument();
+			OffsetsBag bag = new OffsetsBag(doc2, true);
+			AttributeSet defaultColors = AttributesUtilities.createImmutable(StyleConstants.Background, new Color(0, 0, 255));
+			bag.addHighlight(5, 10, defaultColors);
+			AttributeSet defaultColors2 = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 255, 255));
+			bag.addHighlight(2, 5, defaultColors2);
+//			getBag(doc).setHighlights(bag);
+
+//			ArrayList<Lookup> lookups = new ArrayList<Lookup>();
+//			for (MimePath mimePath : mimePaths) {
+//				lookups.add(MimeLookup.getLookup(mimePath));
+//			}
+//			ProxyLookup lookup = new ProxyLookup(lookups.toArray(new Lookup[lookups.size()]));
+			Lookup.Result<HighlightsLayerFactory> factories = Utilities.actionsGlobalContext().lookup(new Lookup.Template<HighlightsLayerFactory>(HighlightsLayerFactory.class));
+			//ModuleLib.log("factories=" + factories);
+			Collection<? extends HighlightsLayerFactory> all = factories.allInstances();
+			ModuleLib.log("all = " + all);
+			for (HighlightsLayerFactory fac : all) {
+				ModuleLib.log("fac = " + fac);
+			}
+
+//			HighlightsContainer hc = HighlightingManager.getInstance(jTextComponent).getBottomHighlights();
 		} catch (FileNotFoundException ex) {
 			Exceptions.printStackTrace(ex);
 		} catch (IOException ex) {
