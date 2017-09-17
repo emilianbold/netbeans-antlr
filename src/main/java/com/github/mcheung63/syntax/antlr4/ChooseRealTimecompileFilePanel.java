@@ -45,6 +45,7 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
         });
         add(comboBox, java.awt.BorderLayout.CENTER);
 
+        refreshButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/mcheung63/arrow_refresh.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(refreshButton, org.openide.util.NbBundle.getMessage(ChooseRealTimecompileFilePanel.class, "ChooseRealTimecompileFilePanel.refreshButton.text")); // NOI18N
         refreshButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -73,31 +74,21 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 			realTimeComboModel.files.clear();
 
 			Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
-//		ArrayList<String> temp = new ArrayList<>();
 			for (TopComponent tc : comps) {
-				ModuleLib.log("tc1 = " + tc);
-//			if (tc.getPeer() instanceof MultiViewFactory) {
 				Node[] arr = tc.getActivatedNodes();
 				if (arr != null) {
 					for (int j = 0; j < arr.length; j++) {
-						JEditorPane editorPane = (JEditorPane) tc.getLookup().lookup(JEditorPane.class);
-						ModuleLib.log("		editorPane = " + editorPane);
 						DataObject dataObject = (DataObject) arr[j].getCookie(DataObject.class);
 						File file = new File(dataObject.getPrimaryFile().getPath());
 						if (file.exists() && file.isFile()/* && !temp.contains(file.getName())*/) {
 							realTimeComboModel.files.add(file);
-//						temp.add(file.getName());
 						}
 					}
 				}
 //			}
 			}
 		}
-//		comboBox.validate();
-//		comboBox.repaint();
-//		ModuleLib.log("size=" + realTimeComboModel.files.size());
-//		for (File file : realTimeComboModel.files) {
-//			ModuleLib.log("\t" + file.getName());
-//		}
+
+		comboBox.setRenderer(new RealTimeComboRenderer()); // if no this line, combobox will show nothing after refeshing with few files
 	}
 }

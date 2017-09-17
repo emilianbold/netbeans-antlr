@@ -18,6 +18,8 @@ public class RealTimeComboRenderer implements ListCellRenderer {
 	@Override
 	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//		label.setOpaque(true);
+//		label.setBackground(Color.red);
 		File file = (File) value;
 		if (file != null) {
 			label.setText(file.getName());

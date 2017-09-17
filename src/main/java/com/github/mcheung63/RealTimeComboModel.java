@@ -1,7 +1,7 @@
 package com.github.mcheung63;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.TreeSet;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
@@ -11,7 +11,7 @@ import javax.swing.event.ListDataListener;
  */
 public class RealTimeComboModel implements ComboBoxModel {
 
-	public ArrayList<File> files = new ArrayList<>();
+	public TreeSet<File> files = new TreeSet<>();
 
 	File selection = null;
 
