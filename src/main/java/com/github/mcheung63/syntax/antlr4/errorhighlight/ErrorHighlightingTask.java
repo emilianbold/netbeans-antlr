@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
-import javax.swing.JComponent;
-import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -19,9 +17,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -137,9 +133,8 @@ public class ErrorHighlightingTask extends ParserResultTask {
 //				for (String tokenName : grammar.getTokenNames()) {
 //					ModuleLib.log("tokenName=" + tokenName);
 //				}
-
 				MyBaseErrorListener errorListener = new MyBaseErrorListener();
-				
+
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(file)));
 				lexer.removeErrorListeners();
 				lexer.addErrorListener(errorListener);
@@ -156,7 +151,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				String startRule = "assemble";
 				Rule start = grammar.getRule(startRule);
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
-				
+
 				//ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 				TopComponent topComponent = TopComponent.getRegistry().getActivated();
 				//ModuleLib.print(topComponent, "\t");
