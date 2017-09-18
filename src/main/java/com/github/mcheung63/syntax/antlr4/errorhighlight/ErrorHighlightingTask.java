@@ -28,6 +28,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.tool.Grammar;
@@ -124,18 +125,18 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				System.out.println("grammar=" + grammar);
 				System.out.println("tool=" + tool);
 
-				for (String rule : grammar.getRuleNames()) {
-					ModuleLib.log("rule=" + rule);
-				}
-				for (String displayName : grammar.getTokenDisplayNames()) {
-					ModuleLib.log("displayNames=" + displayName);
-				}
-				for (String literalName : grammar.getTokenLiteralNames()) {
-					ModuleLib.log("literalName=" + literalName);
-				}
-				for (String tokenName : grammar.getTokenNames()) {
-					ModuleLib.log("tokenName=" + tokenName);
-				}
+//				for (String rule : grammar.getRuleNames()) {
+//					ModuleLib.log("rule=" + rule);
+//				}
+//				for (String displayName : grammar.getTokenDisplayNames()) {
+//					ModuleLib.log("displayNames=" + displayName);
+//				}
+//				for (String literalName : grammar.getTokenLiteralNames()) {
+//					ModuleLib.log("literalName=" + literalName);
+//				}
+//				for (String tokenName : grammar.getTokenNames()) {
+//					ModuleLib.log("tokenName=" + tokenName);
+//				}
 
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(file)));
 				for (Token token : lexer.getAllTokens()) {
@@ -150,9 +151,9 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				parser.removeErrorListeners();
 				parser.addErrorListener(errorListener);
 
-//				String startRule = "assemble";
-//				Rule start = grammar.getRule(startRule);
-				//ParserRuleContext parserRuleContext = parser.parse(start.index);
+				String startRule = "assemble";
+				Rule start = grammar.getRule(startRule);
+				ParserRuleContext parserRuleContext = parser.parse(start.index);
 				//ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 				TopComponent topComponent = TopComponent.getRegistry().getActivated();
 				//ModuleLib.print(topComponent, "\t");
