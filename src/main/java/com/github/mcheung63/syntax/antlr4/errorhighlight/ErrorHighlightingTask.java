@@ -138,22 +138,25 @@ public class ErrorHighlightingTask extends ParserResultTask {
 //					ModuleLib.log("tokenName=" + tokenName);
 //				}
 
+				MyBaseErrorListener errorListener = new MyBaseErrorListener();
+				
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(file)));
+				lexer.removeErrorListeners();
+				lexer.addErrorListener(errorListener);
 				for (Token token : lexer.getAllTokens()) {
 					ModuleLib.log("token=" + token + " = " + grammar.getTokenNames()[token.getType()]);
 				}
 				lexer.reset();
 
-				MyBaseErrorListener errorListener = new MyBaseErrorListener();
 				CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 				ParserInterpreter parser = grammar.createParserInterpreter(tokenStream);
 				parser.getInterpreter().setPredictionMode(PredictionMode.LL);
 				parser.removeErrorListeners();
 				parser.addErrorListener(errorListener);
-
 				String startRule = "assemble";
 				Rule start = grammar.getRule(startRule);
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
+				
 				//ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 				TopComponent topComponent = TopComponent.getRegistry().getActivated();
 				//ModuleLib.print(topComponent, "\t");
