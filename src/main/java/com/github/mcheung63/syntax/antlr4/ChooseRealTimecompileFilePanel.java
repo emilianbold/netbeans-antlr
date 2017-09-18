@@ -29,18 +29,23 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 	public ChooseRealTimecompileFilePanel() {
 		initComponents();
 		initComboBox();
-		setMaximumSize(new Dimension(300, 25));
-		setPreferredSize(new Dimension(300, 25));
+		setMaximumSize(new Dimension(150, 25));
+		setPreferredSize(new Dimension(150, 25));
+		comboBox.setVisible(false);
+		refreshButton.setVisible(false);
 	}
 	
 	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         comboBox = new javax.swing.JComboBox<>();
         refreshButton = new javax.swing.JButton();
+        compileStatusLabel = new javax.swing.JLabel();
 
-        setLayout(new java.awt.BorderLayout());
+        setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        setLayout(new java.awt.GridBagLayout());
 
         comboBox.setModel(realTimeComboModel);
         comboBox.setRenderer(new RealTimeComboRenderer());
@@ -54,7 +59,10 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
                 comboBoxComponentShown(evt);
             }
         });
-        add(comboBox, java.awt.BorderLayout.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        add(comboBox, gridBagConstraints);
 
         refreshButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/mcheung63/arrow_refresh.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(refreshButton, org.openide.util.NbBundle.getMessage(ChooseRealTimecompileFilePanel.class, "ChooseRealTimecompileFilePanel.refreshButton.text")); // NOI18N
@@ -63,7 +71,12 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
                 refreshButtonActionPerformed(evt);
             }
         });
-        add(refreshButton, java.awt.BorderLayout.LINE_END);
+        add(refreshButton, new java.awt.GridBagConstraints());
+
+        org.openide.awt.Mnemonics.setLocalizedText(compileStatusLabel, org.openide.util.NbBundle.getMessage(ChooseRealTimecompileFilePanel.class, "ChooseRealTimecompileFilePanel.compileStatusLabel.text")); // NOI18N
+        compileStatusLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ChooseRealTimecompileFilePanel.class, "ChooseRealTimecompileFilePanel.compileStatusLabel.toolTipText")); // NOI18N
+        compileStatusLabel.setOpaque(true);
+        add(compileStatusLabel, new java.awt.GridBagConstraints());
     }// </editor-fold>//GEN-END:initComponents
 
     private void comboBoxComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_comboBoxComponentShown
@@ -88,6 +101,7 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> comboBox;
+    public javax.swing.JLabel compileStatusLabel;
     private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
 

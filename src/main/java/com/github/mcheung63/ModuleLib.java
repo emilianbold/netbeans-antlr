@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JComponent;
 import org.netbeans.api.io.IOProvider;
 import org.netbeans.api.io.InputOutput;
 
@@ -62,5 +63,30 @@ public class ModuleLib {
 		} else {
 			return false;
 		}
+	}
+
+	public static void print(JComponent component, String str) {
+		ModuleLib.log("+++ " + str + component);
+		for (int x = 0; x < component.getComponentCount(); x++) {
+			if (component.getComponent(x) instanceof JComponent) {
+				print((JComponent) component.getComponent(x), str + "\t");
+			}
+		}
+	}
+
+	public static JComponent getJComponent(JComponent component, Class c, String str) {
+		//ModuleLib.log("---- " + str + component.getClass() + " == " + c + " > " + (component.getClass() == c));
+		if (component.getClass() == c) {
+			return component;
+		}
+		for (int x = 0; x < component.getComponentCount(); x++) {
+			if (component.getComponent(x) instanceof JComponent) {
+				JComponent temp = getJComponent((JComponent) component.getComponent(x), c, str + "\t");
+				if (temp != null) {
+					return temp;
+				}
+			}
+		}
+		return null;
 	}
 }
