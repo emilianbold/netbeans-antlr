@@ -26,10 +26,10 @@ import org.netbeans.modules.parsing.spi.SourceModificationEvent;
  * @author Peter <peter@quantr.hk>
  */
 public class Antlr4Parser extends Parser {
-	
+
 	private Snapshot snapshot;
 	public int embeddedOffset;
-	
+
 	@Override
 	public void parse(Snapshot snapshot, Task task, SourceModificationEvent sme) throws ParseException {
 		this.snapshot = snapshot;
@@ -40,25 +40,28 @@ public class Antlr4Parser extends Parser {
 		parser.addErrorListener(new ANTLRErrorListener() {
 			@Override
 			public void syntaxError(Recognizer<?, ?> rcgnzr, Object offendingSymbol, int lineNumber, int charOffsetFromLine, String message, RecognitionException re) {
-				//ModuleLib.log("error " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + message + ", " + re);
-				
+				ModuleLib.log("syntaxError " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + message + ", " + re);
+
 				Token offendingToken = (Token) offendingSymbol;
 				int start = offendingToken.getStartIndex() + snapshot.getOriginalOffset(0);
 				int stop = offendingToken.getStopIndex() + snapshot.getOriginalOffset(0);
-				
+
 				ErrorHighlightingTask.errorInfos.add(new ErrorInfo(start, stop, message));
 			}
-			
+
 			@Override
 			public void reportAmbiguity(org.antlr.v4.runtime.Parser parser, DFA dfa, int i, int i1, boolean bln, BitSet bitset, ATNConfigSet atncs) {
+				ModuleLib.log("reportAmbiguity");
 			}
-			
+
 			@Override
 			public void reportAttemptingFullContext(org.antlr.v4.runtime.Parser parser, DFA dfa, int i, int i1, BitSet bitset, ATNConfigSet atncs) {
+				ModuleLib.log("reportAttemptingFullContext");
 			}
-			
+
 			@Override
 			public void reportContextSensitivity(org.antlr.v4.runtime.Parser parser, DFA dfa, int i, int i1, int i2, ATNConfigSet atncs) {
+				ModuleLib.log("reportContextSensitivity");
 			}
 		});
 		ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
@@ -66,18 +69,18 @@ public class Antlr4Parser extends Parser {
 		MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
 		walker.walk(listener, context);
 	}
-	
+
 	@Override
 	public Result getResult(Task task) throws ParseException {
 		return new Antlr4ParseResult(snapshot);
 	}
-	
+
 	@Override
 	public void addChangeListener(ChangeListener cl) {
 	}
-	
+
 	@Override
 	public void removeChangeListener(ChangeListener cl) {
 	}
-	
+
 }

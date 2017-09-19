@@ -1,9 +1,13 @@
 package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
 import com.github.mcheung63.ModuleLib;
+import java.util.BitSet;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.netbeans.modules.parsing.spi.Parser;
 
 /**
  *
@@ -17,5 +21,17 @@ public class MyBaseErrorListener extends BaseErrorListener {
 	public void syntaxError(final Recognizer<?, ?> recognizer, final Object offendingSymbol, final int line, final int position, final String msg, final RecognitionException e) {
 		compilerError = true;
 		ModuleLib.log("ERROR :" + line + ":" + position + ": " + msg);
+	}
+
+	public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+		ModuleLib.log("reportAmbiguity");
+	}
+
+	public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+		ModuleLib.log("reportAttemptingFullContext");
+	}
+
+	public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
+		ModuleLib.log("reportContextSensitivity");
 	}
 }
