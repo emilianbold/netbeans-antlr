@@ -1,24 +1,28 @@
 package com.github.mcheung63;
 
-import static com.github.mcheung63.syntax.antlr4.ChooseRealTimecompileFilePanel.maps;
 import java.awt.event.ItemEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
-import org.netbeans.api.editor.EditorRegistry;
+import org.antlr.v4.Tool;
+import org.antlr.v4.parse.ANTLRParser;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.apache.commons.io.IOUtils;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.awt.UndoRedo;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -35,6 +39,7 @@ import org.openide.windows.TopComponent;
 public final class FileTypeG4VisualElement extends JPanel implements MultiViewElement {
 
 	public static HashMap<DataObject, File> maps = new HashMap<>();
+	public static HashMap<DataObject, String> startRules = new HashMap<>();
 
 	private FileTypeG4DataObject obj;
 	private JToolBar toolbar = new JToolBar();
@@ -74,6 +79,9 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         jLabel2 = new javax.swing.JLabel();
         comboBox = new javax.swing.JComboBox<>();
         refreshRealTimeFileButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        startRuleComboBox = new javax.swing.JComboBox<>();
+        refreshStartRuleButton = new javax.swing.JButton();
         treePanel = new javax.swing.JPanel();
         refreshTreeButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -106,17 +114,50 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel3.text")); // NOI18N
+
+        startRuleComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                startRuleComboBoxItemStateChanged(evt);
+            }
+        });
+        startRuleComboBox.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                startRuleComboBoxComponentShown(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(refreshStartRuleButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshStartRuleButton.text")); // NOI18N
+        refreshStartRuleButton.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                refreshStartRuleButtonComponentShown(evt);
+            }
+        });
+        refreshStartRuleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshStartRuleButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout settingPanelLayout = new javax.swing.GroupLayout(settingPanel);
         settingPanel.setLayout(settingPanelLayout);
         settingPanelLayout.setHorizontalGroup(
             settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(settingPanelLayout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(jLabel2)
+                .addGroup(settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, settingPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(startRuleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(settingPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(comboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(comboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(refreshRealTimeFileButton)
+                .addGroup(settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(refreshRealTimeFileButton)
+                    .addComponent(refreshStartRuleButton))
                 .addContainerGap(282, Short.MAX_VALUE))
         );
         settingPanelLayout.setVerticalGroup(
@@ -127,7 +168,12 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
                     .addComponent(comboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(refreshRealTimeFileButton))
-                .addContainerGap(679, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(settingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(startRuleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(refreshStartRuleButton))
+                .addContainerGap(638, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.settingPanel.TabConstraints.tabTitle"), settingPanel); // NOI18N
@@ -428,16 +474,30 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBoxItemStateChanged
 		if (evt.getStateChange() == ItemEvent.SELECTED) {
 			DataObject dataObject = lkp.lookup(DataObject.class);
-
 			File file = (File) evt.getItem();
-//			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
-//			ModuleLib.log(">>> 1=" + jTextComponent);
-//			Document document = jTexttComponent.getDocument();
-//			DataObject dataObject = NbEditorUtilities.getDataObject(document);
-//			ModuleLib.log(">>> 2=" + dataObject.getPrimaryFile().getPath());
 			maps.put(dataObject, file);
 		}
     }//GEN-LAST:event_comboBoxItemStateChanged
+
+    private void startRuleComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_startRuleComboBoxItemStateChanged
+		if (evt.getStateChange() == ItemEvent.SELECTED) {
+			DataObject dataObject = lkp.lookup(DataObject.class);
+			String rule = (String) evt.getItem();
+			startRules.put(dataObject, rule);
+		}
+    }//GEN-LAST:event_startRuleComboBoxItemStateChanged
+
+    private void refreshStartRuleButtonComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_refreshStartRuleButtonComponentShown
+		initStartRuleCombo();
+    }//GEN-LAST:event_refreshStartRuleButtonComponentShown
+
+    private void refreshStartRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshStartRuleButtonActionPerformed
+		initStartRuleCombo();
+    }//GEN-LAST:event_refreshStartRuleButtonActionPerformed
+
+    private void startRuleComboBoxComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_startRuleComboBoxComponentShown
+		initStartRuleCombo();
+    }//GEN-LAST:event_startRuleComboBoxComponentShown
 
 	private void initComboBox() {
 		synchronized (realTimeComboModel.files) {
@@ -468,11 +528,14 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
     private javax.swing.JTextArea contentTextArea;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton refreshRealTimeFileButton;
+    private javax.swing.JButton refreshStartRuleButton;
     private javax.swing.JButton refreshTreeButton;
     private javax.swing.JPanel settingPanel;
+    private javax.swing.JComboBox<String> startRuleComboBox;
     private javax.swing.JTextField startRuleTextField;
     private javax.swing.JPanel treePanel;
     // End of variables declaration//GEN-END:variables
@@ -535,6 +598,31 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 	@Override
 	public CloseOperationState canCloseElement() {
 		return CloseOperationState.STATE_OK;
+	}
+
+	private void initStartRuleCombo() {
+		try {
+			//		JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
+//		if (jTextComponent == null) {
+//			return;
+//		}
+			DataObject dataObject = lkp.lookup(DataObject.class);
+			String content = IOUtils.toString(new FileReader(new File(dataObject.getPrimaryFile().getPath())));
+			Tool tool = new Tool();
+			GrammarRootAST ast = tool.parseGrammarFromString(content);
+			startRuleComboBox.removeAllItems();
+			if (ast.grammarType == ANTLRParser.COMBINED) {
+				Grammar grammar = tool.createGrammar(ast);
+				tool.process(grammar, false);
+				for (String rule : grammar.getRuleNames()) {
+					startRuleComboBox.addItem(rule);
+				}
+			}
+		} catch (FileNotFoundException ex) {
+			Exceptions.printStackTrace(ex);
+		} catch (IOException ex) {
+			Exceptions.printStackTrace(ex);
+		}
 	}
 
 }

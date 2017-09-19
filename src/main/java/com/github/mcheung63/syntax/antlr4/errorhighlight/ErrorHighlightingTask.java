@@ -110,6 +110,9 @@ public class ErrorHighlightingTask extends ParserResultTask {
 	private void realTimeCompile() {
 		try {
 			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
+			if (jTextComponent == null) {
+				return;
+			}
 			Document doc = jTextComponent.getDocument();
 			DataObject dataObject = NbEditorUtilities.getDataObject(doc);
 			File file = FileTypeG4VisualElement.maps.get(dataObject);
@@ -137,7 +140,6 @@ public class ErrorHighlightingTask extends ParserResultTask {
 //				for (String tokenName : grammar.getTokenNames()) {
 //					ModuleLib.log("tokenName=" + tokenName);
 //				}
-
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(file)));
 				for (Token token : lexer.getAllTokens()) {
 					ModuleLib.log("token=" + token + " = " + grammar.getTokenNames()[token.getType()]);
@@ -151,7 +153,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				parser.removeErrorListeners();
 				parser.addErrorListener(errorListener);
 
-				String startRule = "assemble";
+				String startRule = FileTypeG4VisualElement.startRules.get(dataObject);
 				Rule start = grammar.getRule(startRule);
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
 				//ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
