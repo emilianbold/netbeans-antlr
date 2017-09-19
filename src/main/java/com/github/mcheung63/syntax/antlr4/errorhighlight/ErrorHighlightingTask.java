@@ -44,6 +44,8 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.cookies.EditorCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -111,11 +113,35 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			}
 			Document doc = jTextComponent.getDocument();
 			DataObject dataObject = NbEditorUtilities.getDataObject(doc);
-			File file = FileTypeG4VisualElement.maps.get(dataObject);
-			if (file == null) {
+			File targetFile = FileTypeG4VisualElement.maps.get(dataObject);
+			if (targetFile == null) {
 				return;
 			}
 
+			FileObject fileObject = FileUtil.getConfigFile(targetFile.getAbsolutePath());
+			DataObject dataObject3 = DataObject.find(fileObject);
+			EditorCookie ecA = dataObject3.getLookup().lookup(EditorCookie.class);
+			Document doc2A = ecA.getDocument();
+			String mime = (String) doc2A.getProperty("mimeType");
+			ModuleLib.log("mime=" + mime);
+
+			/*TopComponent targetTopComponent = null;
+			Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
+			for (TopComponent tc : comps) {
+				Node[] arr = tc.getActivatedNodes();
+				if (arr != null) {
+					for (int j = 0; j < arr.length; j++) {
+						DataObject dataObject2 = (DataObject) arr[j].getCookie(DataObject.class);
+						File file = new File(dataObject2.getPrimaryFile().getPath());
+						if (file.getAbsolutePath().equals(targetFile.getAbsolutePath())) {
+							targetTopComponent = tc;
+							break;
+						}
+					}
+				}
+			}
+			JTextComponent fuckyou = targetTopComponent.getLookup().lookup(JTextComponent.class);
+			ModuleLib.log("fuckyou=" + fuckyou);*/
 			Tool tool = new Tool();
 			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());
 			if (ast.grammarType == ANTLRParser.COMBINED) {
@@ -137,7 +163,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 //					ModuleLib.log("tokenName=" + tokenName);
 //				}
 				MyBaseErrorListener errorListener = new MyBaseErrorListener();
-				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(file)));
+				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(targetFile)));
 				lexer.removeErrorListeners();
 				lexer.addErrorListener(errorListener);
 				for (Token token : lexer.getAllTokens()) {
