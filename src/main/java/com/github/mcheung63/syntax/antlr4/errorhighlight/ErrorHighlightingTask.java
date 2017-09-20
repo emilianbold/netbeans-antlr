@@ -117,8 +117,8 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			if (targetFile == null) {
 				return;
 			}
-
-			FileObject fileObject = FileUtil.getConfigFile(targetFile.getAbsolutePath());
+			FileObject fileObject = FileUtil.toFileObject(targetFile);
+			ModuleLib.log("fileObject=" + fileObject + ", " + targetFile.getAbsolutePath());
 			DataObject dataObject3 = DataObject.find(fileObject);
 			EditorCookie ecA = dataObject3.getLookup().lookup(EditorCookie.class);
 			Document doc2A = ecA.getDocument();
@@ -178,6 +178,9 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				parser.addErrorListener(errorListener);
 				String startRule = FileTypeG4VisualElement.startRules.get(dataObject);
 				Rule start = grammar.getRule(startRule);
+				if (start == null) {
+					return;
+				}
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
 
 				//ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());

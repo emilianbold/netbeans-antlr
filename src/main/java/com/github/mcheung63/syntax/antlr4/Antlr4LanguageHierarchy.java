@@ -37,7 +37,6 @@ public class Antlr4LanguageHierarchy extends LanguageHierarchy<Antlr4TokenId> {
 			if (name == null) {
 				name = "<INVALID>";
 			}
-			//ModuleLib.log("RLanguageHierarchy static, " + x + " = " + name);
 			Antlr4TokenId token = new Antlr4TokenId(name, name, x);
 			idToToken.put(x, token);
 			tokens.add(token);
@@ -45,19 +44,16 @@ public class Antlr4LanguageHierarchy extends LanguageHierarchy<Antlr4TokenId> {
 	}
 
 	public static synchronized Antlr4TokenId getToken(int id) {
-//		ModuleLib.log("getToken()=" + id + ", len=" + idToToken.size());
 		return idToToken.get(id);
 	}
 
 	@Override
 	protected synchronized Collection<Antlr4TokenId> createTokenIds() {
-//		ModuleLib.log("createTokenIds(), size=" + tokens.size());
 		return tokens;
 	}
 
 	@Override
 	protected synchronized Lexer<Antlr4TokenId> createLexer(LexerRestartInfo<Antlr4TokenId> info) {
-//		ModuleLib.log("createLexer()");
 		return new Antlr4EditorLexer(info);
 	}
 

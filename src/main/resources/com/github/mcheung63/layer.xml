@@ -19,18 +19,14 @@
 				<folder name="FontsColors">
 					<folder name="NetBeans">
 						<folder name="Defaults">
-							<file name="FontAndColors.xml" url="syntax/FontAndColors.xml">
-								<!--<attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.mcheung63.Bundle"/>-->
-							</file>
+							<file name="FontAndColors.xml" url="syntax/FontAndColors.xml"></file>
 						</folder>
 					</folder>
 				</folder>
 				
 				<folder name="Toolbars"> 
 					<folder name="Default"> 
-						<file name="com-github-mcheung63-syntax-antlr4-ChooseRealTimecompileFileAction.instance"> 
-<!--							<attr name="instanceClass" stringvalue="ChooseRealTimecompileFileAction"/>-->
-						</file> 
+						<file name="com-github-mcheung63-syntax-antlr4-ChooseRealTimecompileFileAction.instance"></file> 
 					</folder> 
 				</folder> 
 				

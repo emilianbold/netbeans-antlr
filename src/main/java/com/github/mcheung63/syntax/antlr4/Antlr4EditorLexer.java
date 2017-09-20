@@ -42,20 +42,6 @@ public class Antlr4EditorLexer implements Lexer<Antlr4TokenId> {
 			MyANTLRv4ParserListener.ruleTokenDocumentLocationTargets.clear();
 			MyANTLRv4ParserListener.ruleTokenDocumentLocationSources.clear();
 			walker.walk(listener, context);
-
-//			DataObject.Registry registries = DataObject.getRegistry();
-//			DataObject[] objects = registries.getModified();
-//			for (int i = 0; i < objects.length; i++) {
-//				DataObject dataObj = objects[i];
-//				ModuleLib.log("data object name = " + dataObj.getName());
-//				ModuleLib.log("data object pimary file name = " + dataObj.getPrimaryFile().getName());
-//				Set fss = dataObj.files();
-//				Iterator iter = fss.iterator();
-//				while (iter.hasNext()) {
-//					FileObject fo = (FileObject) iter.next();
-//					ModuleLib.log("\tset file object: " + fo.getName());
-//				}
-//			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
