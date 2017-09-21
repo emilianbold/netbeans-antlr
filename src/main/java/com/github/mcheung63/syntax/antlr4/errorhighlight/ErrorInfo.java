@@ -4,7 +4,7 @@ package com.github.mcheung63.syntax.antlr4.errorhighlight;
  *
  * @author Peter <peter@quantr.hk>
  */
-class ErrorInfo {
+public class ErrorInfo {
 
 	public int offsetStart;
 	public int offsetEnd;

@@ -121,7 +121,6 @@ public class ChooseRealTimecompileFilePanel extends javax.swing.JPanel {
 						}
 					}
 				}
-//			}
 			}
 		}
 		

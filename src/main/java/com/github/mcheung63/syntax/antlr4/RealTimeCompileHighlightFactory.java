@@ -1,5 +1,6 @@
 package com.github.mcheung63.syntax.antlr4;
 
+import com.github.mcheung63.ModuleLib;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.spi.editor.highlighting.HighlightsLayer;
@@ -14,16 +15,17 @@ import org.netbeans.spi.editor.highlighting.ZOrder;
 public class RealTimeCompileHighlightFactory implements HighlightsLayerFactory {
 
 	public static RealTimeCompileHighlighter getRealTimeCompileHighlighter(Document doc) {
-		RealTimeCompileHighlighter highlighter
-				= (RealTimeCompileHighlighter) doc.getProperty(RealTimeCompileHighlighter.class);
+		RealTimeCompileHighlighter highlighter = (RealTimeCompileHighlighter) doc.getProperty(RealTimeCompileHighlighter.class);
 		if (highlighter == null) {
-			doc.putProperty(RealTimeCompileHighlighter.class, highlighter = new RealTimeCompileHighlighter(doc));
+			highlighter = new RealTimeCompileHighlighter(doc);
+			doc.putProperty(RealTimeCompileHighlighter.class, highlighter);
 		}
 		return highlighter;
 	}
 
 	@Override
 	public HighlightsLayer[] createLayers(Context context) {
+		ModuleLib.log("RealTimeCompileHighlightFactory::createLayers");
 		return new HighlightsLayer[]{
 			HighlightsLayer.create(
 			RealTimeCompileHighlighter.class.getName(),
