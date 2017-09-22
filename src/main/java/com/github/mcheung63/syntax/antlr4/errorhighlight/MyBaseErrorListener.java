@@ -34,6 +34,11 @@ public class MyBaseErrorListener extends BaseErrorListener {
 		Token offendingToken = (Token) offendingSymbol;
 		int start = offendingToken.getStartIndex();
 		int stop = offendingToken.getStopIndex();
+		if (start > stop) {
+			int temp = start;
+			start = stop;
+			stop = temp;
+		}
 		ModuleLib.log("ERROR " + line + ":" + position + ", " + start + ", " + stop + ": " + msg);
 		targetErrorInfos.add(new ErrorInfo(start, stop, msg));
 	}
