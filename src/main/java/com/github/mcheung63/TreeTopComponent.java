@@ -9,8 +9,6 @@ import com.github.mcheung63.syntax.antlr4.Ast;
 import com.github.mcheung63.syntax.antlr4.AstNode;
 import com.github.mcheung63.syntax.antlr4.GeneralParserListener;
 import com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener;
-import static com.github.mcheung63.syntax.antlr4.errorhighlight.ErrorHighlightingTask.targetErrorInfos;
-import com.github.mcheung63.syntax.antlr4.errorhighlight.MyBaseErrorListener;
 import com.peterswing.CommonLib;
 import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
 import java.awt.Image;
@@ -30,7 +28,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -394,7 +391,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 			} else {
 				CommonLib.runCommand("dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
 			}
-			Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
+//			Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
 			ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
 			pngFileName = dotPngFile;
 //				icon.getImage().flush();
@@ -527,26 +524,6 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
     private void refreshTargetGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTargetGraphvizButtonActionPerformed
 		try {
-//			ANTLRv4Lexer lexer;
-//			JTextComponent jTextComponent = EditorRegistry.focusedComponent();
-//			if (jTextComponent != null) {
-//				lexer = new ANTLRv4Lexer(new ANTLRInputStream(jTextComponent.getText()));
-//			} else {
-//				TopComponent activeTC = TopComponent.getRegistry().getActivated();
-//				DataObject dataObject = activeTC.getLookup().lookup(DataObject.class);
-//				if (dataObject == null || dataObject.getPrimaryFile() == null) {
-//					return;
-//				}
-//				lexer = new ANTLRv4Lexer(new ANTLRInputStream(dataObject.getPrimaryFile().getInputStream()));
-//			}
-//
-//			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-//			ANTLRv4Parser parser = new ANTLRv4Parser(tokenStream);
-//			ANTLRv4Parser.GrammarSpecContext context = parser.grammarSpec();
-//			ParseTreeWalker walker = new ParseTreeWalker();
-//			MyANTLRv4ParserListener listener = new MyANTLRv4ParserListener(parser);
-//			walker.walk(listener, context);
-
 			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
 			if (jTextComponent == null) {
 				return;
@@ -558,11 +535,6 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 			if (targetFile == null) {
 				return;
 			}
-			FileObject fileObject = FileUtil.toFileObject(targetFile);
-			DataObject targetDataObject = DataObject.find(fileObject);
-			EditorCookie ecA = targetDataObject.getLookup().lookup(EditorCookie.class);
-			Document targetDoc = ecA.getDocument();
-			String mime = (String) targetDoc.getProperty("mimeType");
 
 			Tool tool = new Tool();
 			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());
@@ -610,7 +582,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 				} else {
 					CommonLib.runCommand("dot -Tpng " + dotFile.getAbsolutePath() + " -o " + dotPngFile.getAbsolutePath());
 				}
-				Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
+				//Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
 				ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
 				pngFileName = dotPngFile;
 //				icon.getImage().flush();

@@ -31,21 +31,22 @@ public class GeneralParserListener implements ParseTreeListener {
 
 	@Override
 	public void enterEveryRule(ParserRuleContext ctx) {
+		//System.out.println("ccc=" + ctx.getText());
 		String ruleName = getRuleByKey(ctx.getRuleIndex());
 		String text = ctx.getText();
-		//ModuleLib.log(" ++++--+++ enterEveryRule:" + ruleName + ", " + ctx.getRuleIndex() + ", text=" + text);
+		//System.out.println("enterEveryRule:" + ruleName + ", " + ctx.getRuleIndex() + ", text=" + text);
 		Token s = ctx.getStart();
 		Token e = ctx.getStop();
-		ModuleLib.log(" ++++--+++     s:" + s);
+		//System.out.println("    s:" + s.getText());
 		if (s != null) {
-			ModuleLib.log(" ++++--+++     s.getText():" + s.getText());
+			System.out.println(ruleName + "\ts.getText():\t" + s.getText()+",t\t"+s.getStartIndex());
 		}
-		ModuleLib.log(" ++++--+++     e:" + e);
-		if (e != null) {
-			ModuleLib.log(" ++++--+++     e.getText():" + e.getText());
-		}
-		ModuleLib.log(" ++++--+++     ctx=" + ctx);
-		ModuleLib.log(" ++++--+++     ctx.getText()=" + ctx.getText() + "<");
+//		System.out.println("    e:" + e);
+//		if (e != null) {
+//			System.out.println("    e.getText():" + e.getText());
+//		}
+//		System.out.println("    ctx=" + ctx);
+//		System.out.println("    ctx.getText()=" + ctx.getText() + "<");
 
 		AstNode n = ast.newNode(parentNode, ruleName, text, s != null ? s.getStartIndex() : 0, e != null ? e.getStopIndex() : 0);
 		parentNode.addChild(n);
