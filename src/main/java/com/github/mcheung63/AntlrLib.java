@@ -14,13 +14,13 @@ public class AntlrLib {
 //		for (int x = 0; x < node.getChildren().size(); x++) {
 //			AstNode nn = node.getChild(x);
 //			if (nn.getChildren().size() == 1) {
-//				System.out.println("bingo " + processLabel(nn.getRule(), nn.getLabel()));
+//				System.out.println("bingo " + processLabel(nn.getType(), nn.getLabel()));
 //				AstNode nextNextNode = nn.getChild(0);
 //				while (nextNextNode.getChildren().size() == 1) {
 //					nextNextNode = nextNextNode.getChild(0);
-//					System.out.println("\t\t\tmiddle " + processLabel(nextNextNode.getRule(), nextNextNode.getLabel()));
+//					System.out.println("\t\t\tmiddle " + processLabel(nextNextNode.getType(), nextNextNode.getLabel()));
 //				}
-//				System.out.println("\t\t\t\tfinal " + processLabel(nextNextNode.getRule(), nextNextNode.getLabel()));
+//				System.out.println("\t\t\t\tfinal " + processLabel(nextNextNode.getType(), nextNextNode.getLabel()));
 //				node.getChildren().remove(nn);
 //				node.addChild(nextNextNode);
 //			}
@@ -31,7 +31,6 @@ public class AntlrLib {
 			AstNode nextNode = node.getChild(x);
 
 			//System.out.println("\tnextNode=" + processLabel(nextNode));
-
 			String nextNodeLabel = processLabel(nextNode);
 //			if (nextNodeLabel.equals("STRING")) {
 //				System.out.println("break");
@@ -70,7 +69,7 @@ public class AntlrLib {
 			realLabel = realLabel.split(":")[0];
 		}
 		for (String s : unwantedString) {
-			if (node.getRule().toLowerCase().contains("ruleblock")) {
+			if (node.getType().toLowerCase().contains("ruleblock")) {
 				node.getChildren().clear();
 				return;
 			}
@@ -85,7 +84,7 @@ public class AntlrLib {
 		if (realLabel.contains(":")) {
 			realLabel = realLabel.split(":")[0];
 		}
-		System.out.println(prefix + node.getRule() + "[" + realLabel + "]");
+		System.out.println(prefix + node.getType() + "[" + realLabel + "]");
 		for (AstNode nn : node.getChildren()) {
 			printAst(prefix + "    ", nn);
 		}
@@ -107,10 +106,10 @@ public class AntlrLib {
 				+ "];\n");
 
 		for (AstNode nn : node.getChildren()) {
-			if (nn.getRule().toLowerCase().contains("ruleblock")) {
-				continue;
-			}
-			exportDotChild(node.getRule(), nn, sb);
+//			if (nn.getType().toLowerCase().contains("ruleblock")) {
+//				continue;
+//			}
+			exportDotChild(node.getType(), nn, sb);
 		}
 		sb.append("}\n");
 		return sb.toString();
@@ -118,12 +117,12 @@ public class AntlrLib {
 
 	public static void exportDotChild(String currentNodeText, AstNode node, StringBuffer sb) {
 		String nodeText = processLabel(node);
-		String nodeID = node.getRule() + "-" + (id++);
+		String nodeID = node.getType() + "-" + (id++);
 		sb.append("\"" + nodeID + "\" [label=\"" + nodeText + "\"]\n");
 		sb.append("\"" + currentNodeText + "\" -> \"" + nodeID + "\"\n");
-		if (node.getRule().toLowerCase().contains("ruleblock")) {
-			return;
-		}
+//		if (node.getType().toLowerCase().contains("ruleblock")) {
+//			return;
+//		}
 		for (AstNode nn : node.getChildren()) {
 			exportDotChild(nodeID, nn, sb);
 		}
@@ -142,7 +141,7 @@ public class AntlrLib {
 //		}
 //	}
 	public static String processLabel(AstNode node) {
-		String rule = node.getRule();
+		String rule = node.getType();
 		String label = node.getLabel();
 		if (label.contains(":")) {
 			label = label.split(":")[0];

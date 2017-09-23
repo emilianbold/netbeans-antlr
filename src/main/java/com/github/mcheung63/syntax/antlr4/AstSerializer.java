@@ -32,7 +32,7 @@ public enum AstSerializer {
 				sb.append(n.getEscapedLabel());
 				sb.append("\\n");
 			}
-			sb.append(n.getRule());
+			sb.append(n.getType());
 			sb.append("\"];\n");
 		}
 

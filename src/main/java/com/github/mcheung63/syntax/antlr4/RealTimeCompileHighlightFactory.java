@@ -25,7 +25,6 @@ public class RealTimeCompileHighlightFactory implements HighlightsLayerFactory {
 
 	@Override
 	public HighlightsLayer[] createLayers(Context context) {
-		ModuleLib.log("RealTimeCompileHighlightFactory::createLayers");
 		return new HighlightsLayer[]{
 			HighlightsLayer.create(
 			RealTimeCompileHighlighter.class.getName(),

@@ -575,7 +575,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
 				CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 				ParserInterpreter parser = grammar.createParserInterpreter(tokenStream);
-				parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+				//parser.getInterpreter().setPredictionMode(PredictionMode.LL);
 				GeneralParserListener listener = new GeneralParserListener(parser);
 				parser.addParseListener(listener);
 				String startRule = FileTypeG4VisualElement.startRules.get(dataObject);
@@ -589,13 +589,13 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 				AstNode root = astNode.getRoot();
 				root.setLabel(targetFile.getName());
 				//AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
-				AntlrLib.removeOneLeafNodes(root);
+				//AntlrLib.removeOneLeafNodes(root);
 				AntlrLib.printAst("", root);
 
 				String dot = AntlrLib.exportDot(root);
 
 				System.out.println(dot);
-
+				ModuleLib.log("targetFileName=" + targetFileName);
 				File dotFile = File.createTempFile(targetFileName, ".dot");
 				File dotPngFile = File.createTempFile(targetFileName, ".png");
 				FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
@@ -621,7 +621,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 					ratio = 1;
 				}
 				preferHeight = (int) (icon.getIconHeight() * ratio);
-				graphvizLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+				graphvizTargetGraphLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
 
 				dotFile.delete();
 				dotPngFile.deleteOnExit();

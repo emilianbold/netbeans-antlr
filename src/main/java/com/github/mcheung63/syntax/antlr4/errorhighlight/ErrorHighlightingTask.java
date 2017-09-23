@@ -121,7 +121,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			if (ast.grammarType == ANTLRParser.COMBINED) {
 				Grammar grammar = tool.createGrammar(ast);
 				tool.process(grammar, false);
-				
+
 				targetErrorInfos.clear();
 				MyBaseErrorListener targetErrorListener = new MyBaseErrorListener(targetDataObject, targetErrorInfos);
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(targetFile)));
@@ -151,10 +151,12 @@ public class ErrorHighlightingTask extends ParserResultTask {
 
 				TopComponent topComponent = TopComponent.getRegistry().getActivated();
 				ChooseRealTimecompileFilePanel chooseRealTimecompileFilePanel = (ChooseRealTimecompileFilePanel) ModuleLib.getJComponent(topComponent, ChooseRealTimecompileFilePanel.class, "\t");
-				if (targetErrorListener.compilerError) {
-					chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.red);
-				} else {
-					chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.green);
+				if (chooseRealTimecompileFilePanel != null) {
+					if (targetErrorListener.compilerError) {
+						chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.red);
+					} else {
+						chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.green);
+					}
 				}
 			}
 		} catch (FileNotFoundException ex) {

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class AstNode {
 
 	private String label;
-	private String ntype;
+	private String type;
 	private AstNode parent;
 	private Ast tree;
 	private int id;
@@ -30,23 +30,23 @@ public class AstNode {
 		id = cnt++;
 	}
 
-	protected AstNode(Ast tree, AstNode parent, String nt, String label, int sidx, int eidx) {
+	protected AstNode(Ast tree, AstNode parent, String type, String label, int sidx, int eidx) {
 		this(tree);
-		ntype = nt;
+		this.type = type;
 		this.label = label;
 		this.parent = parent;
 		this.sidx = sidx;
 		this.eidx = eidx;
 	}
 
-	protected AstNode(Ast tree, AstNode nod) {
+	protected AstNode(Ast tree, AstNode node) {
 		this(tree);
-		id = nod.id;
-		ntype = nod.ntype;
-		label = nod.label;
-		this.eidx = nod.eidx;
-		this.sidx = nod.sidx;
-		for (AstNode c : nod.children) {
+		id = node.id;
+		type = node.type;
+		label = node.label;
+		this.eidx = node.eidx;
+		this.sidx = node.sidx;
+		for (AstNode c : node.children) {
 			AstNode cnod = new AstNode(tree, c);
 			cnod.parent = this;
 			this.tree.nodes.add(cnod);
@@ -115,8 +115,8 @@ public class AstNode {
 		return id;
 	}
 
-	public String getRule() {
-		return ntype;
+	public String getType() {
+		return type;
 	}
 
 	public String getEscapedLabel() {
@@ -151,12 +151,12 @@ public class AstNode {
 		}
 
 		AstNode n = (AstNode) o;
-		return n.getId() == getId() && n.ntype.equals(ntype) && n.label.equals(label) && children.equals(n.children);
+		return n.getId() == getId() && n.type.equals(type) && n.label.equals(label) && children.equals(n.children);
 	}
 
 	@Override
 	public String toString() {
-		return id + " " + ntype + " " + label;
+		return id + " " + type + " " + label;
 	}
 
 	public boolean isLeaf() {
