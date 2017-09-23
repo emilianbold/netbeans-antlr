@@ -112,48 +112,16 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				return;
 			}
 			FileObject fileObject = FileUtil.toFileObject(targetFile);
-			ModuleLib.log("fileObject=" + fileObject + ", " + targetFile.getAbsolutePath());
 			DataObject targetDataObject = DataObject.find(fileObject);
 			EditorCookie ecA = targetDataObject.getLookup().lookup(EditorCookie.class);
 			Document targetDoc = ecA.getDocument();
-			String mime = (String) targetDoc.getProperty("mimeType");
-			ModuleLib.log("mime=" + mime);
 
-			/*TopComponent targetTopComponent = null;
-			Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
-			for (TopComponent tc : comps) {
-				Node[] arr = tc.getActivatedNodes();
-				if (arr != null) {
-					for (int j = 0; j < arr.length; j++) {
-						DataObject dataObject2 = (DataObject) arr[j].getCookie(DataObject.class);
-						File file = new File(dataObject2.getPrimaryFile().getPath());
-						if (file.getAbsolutePath().equals(targetFile.getAbsolutePath())) {
-							targetTopComponent = tc;
-							break;
-						}
-					}
-				}
-			}
-			JTextComponent fuckyou = targetTopComponent.getLookup().lookup(JTextComponent.class);
-			ModuleLib.log("fuckyou=" + fuckyou);*/
 			Tool tool = new Tool();
 			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());
 			if (ast.grammarType == ANTLRParser.COMBINED) {
 				Grammar grammar = tool.createGrammar(ast);
 				tool.process(grammar, false);
-
-//				for (String rule : grammar.getRuleNames()) {
-//					ModuleLib.log("rule=" + rule);
-//				}
-//				for (String displayName : grammar.getTokenDisplayNames()) {
-//					ModuleLib.log("displayNames=" + displayName);
-//				}
-//				for (String literalName : grammar.getTokenLiteralNames()) {
-//					ModuleLib.log("literalName=" + literalName);
-//				}
-//				for (String tokenName : grammar.getTokenNames()) {
-//					ModuleLib.log("tokenName=" + tokenName);
-//				}
+				
 				targetErrorInfos.clear();
 				MyBaseErrorListener targetErrorListener = new MyBaseErrorListener(targetDataObject, targetErrorInfos);
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(targetFile)));
@@ -181,47 +149,13 @@ public class ErrorHighlightingTask extends ParserResultTask {
 					realTimeCompileHighlight.bag.addHighlight(errorInfo.offsetStart, errorInfo.offsetEnd, realTimeCompileHighlight.defaultColors);
 				}
 
-				//ModuleLib.log("parserRuleContext.toStringTree()=" + parserRuleContext.toStringTree());
 				TopComponent topComponent = TopComponent.getRegistry().getActivated();
-				//ModuleLib.print(topComponent, "\t");
 				ChooseRealTimecompileFilePanel chooseRealTimecompileFilePanel = (ChooseRealTimecompileFilePanel) ModuleLib.getJComponent(topComponent, ChooseRealTimecompileFilePanel.class, "\t");
 				if (targetErrorListener.compilerError) {
 					chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.red);
 				} else {
 					chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.green);
 				}
-
-				/*Highlighter highlighter = jTextComponent.getHighlighter();
-				HighlightPainter highlightPainter = new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN);
-				highlighter.addHighlight(5, 10, highlightPainter);*/
-//			jTextComponent.repaint();
-
-				/*EditorCookie ec = dataObject.getLookup().lookup(EditorCookie.class);
-				Document doc2 = ec.getDocument();
-				OffsetsBag bag = new OffsetsBag(doc2, true);
-				AttributeSet defaultColors = AttributesUtilities.createImmutable(StyleConstants.Background, new Color(0, 0, 255));
-				bag.addHighlight(5, 10, defaultColors);
-				AttributeSet defaultColors2 = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 255, 255));
-				bag.addHighlight(2, 5, defaultColors2);*/
-//				StyleContext sc = StyleContext.getDefaultStyleContext();
-//				AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.blue);
-//				aset = sc.addAttribute(aset, StyleConstants.Background, Color.red);
-//				((JTextPane) jTextComponent).setCharacterAttributes(aset, true);
-//			getBag(doc).setHighlights(bag);
-//			ArrayList<Lookup> lookups = new ArrayList<Lookup>();
-//			for (MimePath mimePath : mimePaths) {
-//				lookups.add(MimeLookup.getLookup(mimePath));
-//			}
-//			ProxyLookup lookup = new ProxyLookup(lookups.toArray(new Lookup[lookups.size()]));
-				Lookup.Result<HighlightsLayerFactory> factories = targetDataObject.getLookup().lookup(new Lookup.Template<HighlightsLayerFactory>(HighlightsLayerFactory.class));
-				//ModuleLib.log("factories=" + factories);
-				Collection<? extends HighlightsLayerFactory> all = factories.allInstances();
-				ModuleLib.log("all = " + all);
-				for (HighlightsLayerFactory fac : all) {
-					ModuleLib.log("fac = " + fac);
-				}
-
-//			HighlightsContainer hc = HighlightingManager.getInstance(jTextComponent).getBottomHighlights();
 			}
 		} catch (FileNotFoundException ex) {
 			Exceptions.printStackTrace(ex);

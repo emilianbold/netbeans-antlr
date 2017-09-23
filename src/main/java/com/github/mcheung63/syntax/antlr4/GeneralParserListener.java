@@ -1,21 +1,23 @@
 package com.github.mcheung63.syntax.antlr4;
 
+import com.github.mcheung63.ModuleLib;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import org.antlr.parser.antlr4.ANTLRv4Parser;
-import org.antlr.parser.antlr4.ANTLRv4ParserBaseListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  *
- * @author Peter (peter@quantr.hk)
+ * @author Peter <peter@quantr.hk>
  */
-public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
+public class GeneralParserListener implements ParseTreeListener {
 
 	public Ast ast = null;
 	private final Map<String, Integer> rmap = new HashMap<>();
@@ -25,7 +27,7 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 	public static ArrayList<TokenDocumentLocation> ruleTokenDocumentLocationTargets = new ArrayList<TokenDocumentLocation>();
 	public static ArrayList<TokenDocumentLocation> ruleTokenDocumentLocationSources = new ArrayList<TokenDocumentLocation>();
 
-	public MyANTLRv4ParserListener(Parser parser) {
+	public GeneralParserListener(Parser parser) {
 		ast = new Ast("root", "root");
 		parentNode = ast.getRoot();
 		rmap.putAll(parser.getRuleIndexMap());
@@ -34,6 +36,7 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 	@Override
 	public void enterEveryRule(ParserRuleContext ctx) {
 		String ruleName = getRuleByKey(ctx.getRuleIndex());
+		ModuleLib.log(" ++++--+++ enterEveryRule:" + ruleName);
 		String text = ctx.getText();
 		Token s = ctx.getStart();
 		Token e = ctx.getStop();
@@ -66,15 +69,9 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 
 	@Override
 	public void exitEveryRule(ParserRuleContext ctx) {
-		String rule = getRuleByKey(ctx.getRuleIndex());
+		String ruleName = getRuleByKey(ctx.getRuleIndex());
+		ModuleLib.log(" ++++--+++ exitEveryRule:" + ruleName);
 		parentNode = parentNode.getParent();
-	}
-
-	@Override
-	public void enterGrammarSpec(ANTLRv4Parser.GrammarSpecContext ctx) {
-		if (ast != null && ast.getRoot() != null && ctx != null && ctx.identifier()!=null) {
-			ast.getRoot().setLabel(ctx.identifier().getText());
-		}
 	}
 
 	public String getRuleByKey(int key) {
@@ -93,4 +90,13 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 		}
 		return false;
 	}
+
+	@Override
+	public void visitTerminal(TerminalNode tn) {
+	}
+
+	@Override
+	public void visitErrorNode(ErrorNode en) {
+	}
+
 }
