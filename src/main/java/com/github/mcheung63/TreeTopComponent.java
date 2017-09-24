@@ -14,8 +14,6 @@ import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Files;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import javax.swing.ImageIcon;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -38,9 +36,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.cookies.EditorCookie;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
@@ -548,14 +543,16 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 				CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 				ParserInterpreter parser = grammar.createParserInterpreter(tokenStream);
 				//parser.getInterpreter().setPredictionMode(PredictionMode.LL);
-				GeneralParserListener listener = new GeneralParserListener(parser);
-				parser.addParseListener(listener);
 				String startRule = FileTypeG4VisualElement.startRules.get(dataObject);
 				Rule start = grammar.getRule(startRule);
 				if (start == null) {
 					return;
 				}
-				ParserRuleContext parserRuleContext = parser.parse(start.index);
+				ParserRuleContext context = parser.parse(start.index);
+
+				ParseTreeWalker walker = new ParseTreeWalker();
+				GeneralParserListener listener = new GeneralParserListener(parser);
+				walker.walk(listener, context);
 
 				Ast astNode = listener.ast;
 				AstNode root = astNode.getRoot();
