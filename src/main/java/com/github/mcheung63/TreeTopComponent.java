@@ -5,12 +5,24 @@
  */
 package com.github.mcheung63;
 
+import static com.github.mcheung63.AntlrLib.id;
+import static com.github.mcheung63.AntlrLib.processLabel;
 import com.github.mcheung63.syntax.antlr4.Ast;
 import com.github.mcheung63.syntax.antlr4.AstNode;
+import com.github.mcheung63.syntax.antlr4.CallGraphComponent;
 import com.github.mcheung63.syntax.antlr4.GeneralParserListener;
 import com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener;
+import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.swing.util.mxMorphing;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource;
+import com.mxgraph.view.mxGraph;
 import com.peterswing.CommonLib;
 import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
+import java.awt.BorderLayout;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,11 +86,33 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	int preferHeight;
 	AntlrTreeNode rootNode = new AntlrTreeNode("Grammar", "Grammar");
 	AntlrTreeModel treeModel = new AntlrTreeModel(rootNode);
+	mxGraph graph = new mxGraph() {
+		public boolean isPort(Object cell) {
+			mxGeometry geo = getCellGeometry(cell);
+
+			return (geo != null) ? geo.isRelative() : false;
+		}
+
+		public String getToolTipForCell(Object cell) {
+			if (model.isEdge(cell)) {
+				return convertValueToString(model.getTerminal(cell, true)) + " -> " + convertValueToString(model.getTerminal(cell, false));
+			}
+
+			return super.getToolTipForCell(cell);
+		}
+
+		public boolean isCellFoldable(Object cell, boolean collapse) {
+			return false;
+		}
+	};
+	CallGraphComponent graphComponent = new CallGraphComponent(graph);
 
 	public TreeTopComponent() {
 		initComponents();
 		setName(Bundle.CTL_TreeTopComponent());
 		setToolTipText(Bundle.HINT_TreeTopComponent());
+
+		targetJGraphPanel.add(graphComponent, BorderLayout.CENTER);
 
 //		result = Utilities.actionsGlobalContext().lookupResult(DataObject.class);
 //		result.addLookupListener(this);
@@ -94,6 +128,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private void initComponents() {
 
         mainTabbedPane = new javax.swing.JTabbedPane();
+        targetJGraphPanel = new javax.swing.JPanel();
         targetGraphPanel = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
         refreshTargetGraphvizButton = new javax.swing.JButton();
@@ -124,6 +159,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
         searchAntlrTreeTextField = new com.peterswing.advancedswing.searchtextfield.JSearchTextField();
 
         setLayout(new java.awt.BorderLayout());
+
+        targetJGraphPanel.setLayout(new java.awt.BorderLayout());
+        mainTabbedPane.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.targetJGraphPanel.TabConstraints.tabTitle"), targetJGraphPanel); // NOI18N
 
         targetGraphPanel.setLayout(new java.awt.BorderLayout());
 
@@ -562,9 +600,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 				AntlrLib.printAst("", root);
 
 				String dot = AntlrLib.exportDot(root);
+				buildJGraph(root);
 
 				System.out.println(dot);
-				ModuleLib.log("targetFileName=" + targetFileName);
 				File dotFile = File.createTempFile(targetFileName, ".dot");
 				File dotPngFile = File.createTempFile(targetFileName, ".png");
 				FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
@@ -646,6 +684,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private javax.swing.JButton show100ImageButton;
     private javax.swing.JButton show100TargetGraphImageButton;
     private javax.swing.JPanel targetGraphPanel;
+    private javax.swing.JPanel targetJGraphPanel;
     private javax.swing.JPanel treePanel;
     private javax.swing.JButton zoomInButton;
     private javax.swing.JButton zoomInTargetGraphButton;
@@ -673,6 +712,62 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 //	}
 	ImageIcon resizeImage(ImageIcon icon, int width, int height) {
 		return new ImageIcon(icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+	}
+
+	private void buildJGraph(AstNode root) {
+		Object parent = graph.getDefaultParent();
+		exportDot(parent, )
+		mxCell newNode = (mxCell) graph.insertVertex(parent, null, "fuck", 40, 40, 150, 30);
+		mxCell newNode2 = (mxCell) graph.insertVertex(parent, null, "fuck", 140, 140, 150, 30);
+		graph.insertEdge(parent, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
+		graph.setCellsDisconnectable(false);
+		graph.getModel().beginUpdate();
+		mxMorphing morph = new mxMorphing(graphComponent, 20, 1.2, 20);
+		morph.addListener(mxEvent.DONE, new mxEventSource.mxIEventListener() {
+			public void invoke(Object sender, mxEventObject evt) {
+				graph.getModel().endUpdate();
+			}
+		});
+
+		morph.startAnimation();
+	}
+	
+	public static String exportDot(AstNode node) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("digraph \"Grammar\" {\n"
+				+ "	graph [	"
+				+ "		fontname = \"Arial\",\n"
+				+ "		splines  = ortho,\n"
+				+ "		fontsize = 8,"
+				+ "		rankdir=\"LR\",\n"
+				+ "	];\n"
+				+ "	node [	"
+				+ "		shape    = \"box\",\n"
+				+ "     style    = \"filled\",\n"
+				+ "		fontname = \"Arial\"\n"
+				+ "];\n");
+
+		for (AstNode nn : node.getChildren()) {
+//			if (nn.getType().toLowerCase().contains("ruleblock")) {
+//				continue;
+//			}
+			exportDotChild(node.getType(), nn, sb);
+		}
+		sb.append("}\n");
+		return sb.toString();
+	}
+
+	public static void exportDotChild(String currentNodeText, AstNode node, StringBuffer sb) {
+		String nodeText = processLabel(node);
+		String nodeID = node.getType() + "-" + (id++);
+		sb.append("\"" + nodeID + "\" [label=\"" + nodeText + "\"]\n");
+		sb.append("\"" + currentNodeText + "\" -> \"" + nodeID + "\"\n");
+//		if (node.getType().toLowerCase().contains("ruleblock")) {
+//			return;
+//		}
+		for (AstNode nn : node.getChildren()) {
+			exportDotChild(nodeID, nn, sb);
+		}
 	}
 
 }
