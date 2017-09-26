@@ -12,6 +12,7 @@ import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.view.mxCellState;
 
 public class PeterSwingCanvas extends mxInteractiveCanvas {
+
 	protected CellRendererPane rendererPane = new CellRendererPane();
 
 	protected JLabel jLabel = new JLabel();
@@ -33,8 +34,7 @@ public class PeterSwingCanvas extends mxInteractiveCanvas {
 
 	public void drawVertex(mxCellState state, String label) {
 		jLabel.setText(label);
-		rendererPane.paintComponent(g, jLabel, graphComponent, (int) state.getX() + translate.x, (int) state.getY() + translate.y, (int) state.getWidth(), (int) state.getHeight(),
-				true);
+		rendererPane.paintComponent(g, jLabel, graphComponent, (int) (state.getX() + translate.getX()), (int) (state.getY() + translate.getY()), (int) state.getWidth(), (int) state.getHeight(), true);
 	}
 
 }
