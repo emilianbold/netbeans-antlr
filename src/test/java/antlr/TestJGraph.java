@@ -40,10 +40,10 @@ public class TestJGraph {
 				return false;
 			}
 		};
-		Object parent = graph.getDefaultParent();
-		mxCell newNode = (mxCell) graph.insertVertex(parent, null, "fuck", 40, 40, 150, 30);
-		mxCell newNode2 = (mxCell) graph.insertVertex(parent, null, "fuck", 140, 140, 150, 30);
-		graph.insertEdge(parent, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
+		//Object parent = graph.getDefaultParent();
+		mxCell newNode = (mxCell) graph.insertVertex(null, null, "fuck", 40, 40, 150, 30);
+		mxCell newNode2 = (mxCell) graph.insertVertex(null, null, "fuck", 140, 140, 150, 30);
+		graph.insertEdge(null, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
 
 		graph.setCellsDisconnectable(false);
 		CallGraphComponent graphComponent = new CallGraphComponent(graph);

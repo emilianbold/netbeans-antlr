@@ -12,6 +12,15 @@ import com.github.mcheung63.syntax.antlr4.AstNode;
 import com.github.mcheung63.syntax.antlr4.CallGraphComponent;
 import com.github.mcheung63.syntax.antlr4.GeneralParserListener;
 import com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener;
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.layout.mxEdgeLabelLayout;
+import com.mxgraph.layout.mxFastOrganicLayout;
+import com.mxgraph.layout.mxOrganicLayout;
+import com.mxgraph.layout.mxParallelEdgeLayout;
+import com.mxgraph.layout.mxStackLayout;
+import com.mxgraph.layout.orthogonal.mxOrthogonalLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.util.mxMorphing;
@@ -27,6 +36,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.antlr.parser.antlr4.ANTLRv4Lexer;
@@ -82,6 +92,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 //	Lookup.Result<DataObject> result;
 //	public static DataObject lastDataObject;
 	File pngFileName;
+	File pngTargetGraphFileName;
 	int preferWidth;
 	int preferHeight;
 	AntlrTreeNode rootNode = new AntlrTreeNode("Grammar", "Grammar");
@@ -119,6 +130,17 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		antlrTree.setModel(treeModel);
 		antlrTree.setCellRenderer(new AntlrTreeRenderer());
 		antlrTree.setShowsRootHandles(true);
+
+		layoutButton.removeAll();
+		layoutButton.add(new JMenuItem("Hierarchical Layout"));
+		layoutButton.add(new JMenuItem("Circle Layout"));
+		layoutButton.add(new JMenuItem("Organic Layout"));
+		layoutButton.add(new JMenuItem("Compact Tree Layout"));
+		layoutButton.add(new JMenuItem("Edge Label Layout"));
+		layoutButton.add(new JMenuItem("Fast Organic Layout"));
+		layoutButton.add(new JMenuItem("Orthogonal Layout"));
+		layoutButton.add(new JMenuItem("Parallel Edge Layout"));
+		layoutButton.add(new JMenuItem("Stack Layout"));
 	}
 
 	/**
@@ -129,6 +151,11 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
         mainTabbedPane = new javax.swing.JTabbedPane();
         targetJGraphPanel = new javax.swing.JPanel();
+        jToolBar4 = new javax.swing.JToolBar();
+        zoomOutJGraphButton = new javax.swing.JButton();
+        show100ImageJGraphButton = new javax.swing.JButton();
+        zoomInJGraphButton = new javax.swing.JButton();
+        layoutButton = new com.peterswing.advancedswing.jdropdownbutton.JDropDownButton();
         targetGraphPanel = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
         refreshTargetGraphvizButton = new javax.swing.JButton();
@@ -161,6 +188,55 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
         setLayout(new java.awt.BorderLayout());
 
         targetJGraphPanel.setLayout(new java.awt.BorderLayout());
+
+        jToolBar4.setRollover(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(zoomOutJGraphButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.zoomOutJGraphButton.text")); // NOI18N
+        zoomOutJGraphButton.setFocusable(false);
+        zoomOutJGraphButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        zoomOutJGraphButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        zoomOutJGraphButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomOutJGraphButtonActionPerformed(evt);
+            }
+        });
+        jToolBar4.add(zoomOutJGraphButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(show100ImageJGraphButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.show100ImageJGraphButton.text")); // NOI18N
+        show100ImageJGraphButton.setFocusable(false);
+        show100ImageJGraphButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        show100ImageJGraphButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        show100ImageJGraphButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                show100ImageJGraphButtonActionPerformed(evt);
+            }
+        });
+        jToolBar4.add(show100ImageJGraphButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(zoomInJGraphButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.zoomInJGraphButton.text")); // NOI18N
+        zoomInJGraphButton.setFocusable(false);
+        zoomInJGraphButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        zoomInJGraphButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        zoomInJGraphButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomInJGraphButtonActionPerformed(evt);
+            }
+        });
+        jToolBar4.add(zoomInJGraphButton);
+
+        org.openide.awt.Mnemonics.setLocalizedText(layoutButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.layoutButton.text")); // NOI18N
+        layoutButton.setFocusable(false);
+        layoutButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        layoutButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        layoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                layoutButtonActionPerformed(evt);
+            }
+        });
+        jToolBar4.add(layoutButton);
+
+        targetJGraphPanel.add(jToolBar4, java.awt.BorderLayout.PAGE_START);
+
         mainTabbedPane.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.targetJGraphPanel.TabConstraints.tabTitle"), targetJGraphPanel); // NOI18N
 
         targetGraphPanel.setLayout(new java.awt.BorderLayout());
@@ -619,7 +695,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 				}
 				//Files.copy(dotPngFile.toPath(), new File("/Users/peter/Desktop/b.png").toPath(), REPLACE_EXISTING);
 				ImageIcon icon = new ImageIcon(dotPngFile.getAbsolutePath());
-				pngFileName = dotPngFile;
+				pngTargetGraphFileName = dotPngFile;
 //				icon.getImage().flush();
 
 				preferWidth = graphvizLabel.getWidth() > icon.getIconWidth() ? icon.getIconWidth() : graphvizLabel.getWidth();
@@ -639,15 +715,38 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     }//GEN-LAST:event_refreshTargetGraphvizButtonActionPerformed
 
     private void zoomOutTargetGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutTargetGraphButtonActionPerformed
-		// TODO add your handling code here:
+		if (pngTargetGraphFileName != null && pngTargetGraphFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngTargetGraphFileName.getAbsolutePath());
+
+			icon.getImage().flush();
+			preferWidth = (int) (((float) preferWidth) * 1.1);
+			preferHeight = (int) (((float) preferHeight) * 1.1);
+			graphvizTargetGraphLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+		}
+
     }//GEN-LAST:event_zoomOutTargetGraphButtonActionPerformed
 
     private void show100TargetGraphImageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_show100TargetGraphImageButtonActionPerformed
-		// TODO add your handling code here:
+		if (pngTargetGraphFileName != null && pngTargetGraphFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngTargetGraphFileName.getAbsolutePath());
+			icon.getImage().flush();
+			preferWidth = icon.getIconWidth();
+			preferHeight = icon.getIconHeight();
+			graphvizTargetGraphLabel.setIcon(resizeImage(icon, icon.getIconWidth(), icon.getIconHeight()));
+		}
+
     }//GEN-LAST:event_show100TargetGraphImageButtonActionPerformed
 
     private void zoomInTargetGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInTargetGraphButtonActionPerformed
-		// TODO add your handling code here:
+
+		if (pngTargetGraphFileName != null && pngTargetGraphFileName.exists()) {
+			ImageIcon icon = new ImageIcon(pngTargetGraphFileName.getAbsolutePath());
+			icon.getImage().flush();
+			preferWidth = (int) (((float) preferWidth) * 0.9);
+			preferHeight = (int) (((float) preferHeight) * 0.9);
+			graphvizTargetGraphLabel.setIcon(resizeImage(icon, preferWidth, preferHeight));
+		}
+
     }//GEN-LAST:event_zoomInTargetGraphButtonActionPerformed
 
     private void graphvizFitTargetGraphWidthButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_graphvizFitTargetGraphWidthButtonActionPerformed
@@ -657,6 +756,82 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private void graphvizFitTargetGraphHeightButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_graphvizFitTargetGraphHeightButtonActionPerformed
 		// TODO add your handling code here:
     }//GEN-LAST:event_graphvizFitTargetGraphHeightButtonActionPerformed
+
+    private void zoomOutJGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutJGraphButtonActionPerformed
+		if (graphComponent != null) {
+			graphComponent.zoomOut();
+		}
+    }//GEN-LAST:event_zoomOutJGraphButtonActionPerformed
+
+    private void show100ImageJGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_show100ImageJGraphButtonActionPerformed
+		if (graphComponent != null) {
+			graphComponent.zoomActual();
+		}
+    }//GEN-LAST:event_show100ImageJGraphButtonActionPerformed
+
+    private void zoomInJGraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInJGraphButtonActionPerformed
+		if (graphComponent != null) {
+			graphComponent.zoomIn();
+		}
+    }//GEN-LAST:event_zoomInJGraphButtonActionPerformed
+
+    private void layoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_layoutButtonActionPerformed
+		final mxGraph graph = graphComponent.getGraph();
+		Object cell = graph.getSelectionCell();
+
+		if (cell == null || graph.getModel().getChildCount(cell) == 0) {
+			cell = graph.getDefaultParent();
+		}
+		graph.getModel().beginUpdate();
+
+		String str;
+		if (layoutButton.getEventSource() == null) {
+			str = "Hierarchical Layout";
+		} else {
+			str = ((JMenuItem) layoutButton.getEventSource()).getText();
+		}
+		layoutButton.setText(str);
+		if (str.equals("Hierarchical Layout")) {
+			mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+			layout.execute(cell);
+		} else if (str.equals("Circle Layout")) {
+			mxCircleLayout layout = new mxCircleLayout(graph);
+			layout.setDisableEdgeStyle(false);
+			layout.execute(cell);
+		} else if (str.equals("Organic Layout")) {
+			mxOrganicLayout layout = new mxOrganicLayout(graph);
+			layout.execute(cell);
+		} else if (str.equals("Compact Tree Layout")) {
+			mxCompactTreeLayout layout = new mxCompactTreeLayout(graph, false);
+			layout.execute(cell);
+		} else if (str.equals("Edge Label Layout")) {
+			mxEdgeLabelLayout layout = new mxEdgeLabelLayout(graph);
+			layout.execute(cell);
+		} else if (str.equals("Fast Organic Layout")) {
+			mxFastOrganicLayout layout = new mxFastOrganicLayout(graph);
+			layout.execute(cell);
+		} else if (str.equals("Orthogonal Layout")) {
+			mxOrthogonalLayout layout = new mxOrthogonalLayout(graph);
+			layout.execute(cell);
+		} else if (str.equals("Parallel Edge Layout")) {
+			mxParallelEdgeLayout layout = new mxParallelEdgeLayout(graph);
+			layout.execute(cell);
+		} else if (str.equals("Stack Layout")) {
+			mxStackLayout layout = new mxStackLayout(graph);
+			layout.execute(cell);
+		} else {
+			System.out.println("no this layout");
+		}
+
+		mxMorphing morph = new mxMorphing(graphComponent, 20, 1.2, 20);
+		morph.addListener(mxEvent.DONE, new mxEventSource.mxIEventListener() {
+			public void invoke(Object sender, mxEventObject evt) {
+				graph.getModel().endUpdate();
+			}
+		});
+
+		morph.startAnimation();
+    }//GEN-LAST:event_layoutButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -676,19 +851,24 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
     private javax.swing.JToolBar jToolBar3;
+    private javax.swing.JToolBar jToolBar4;
+    private com.peterswing.advancedswing.jdropdownbutton.JDropDownButton layoutButton;
     private javax.swing.JTabbedPane mainTabbedPane;
     private javax.swing.JButton refreshAntlrTreeButton;
     private javax.swing.JButton refreshGraphvizButton;
     private javax.swing.JButton refreshTargetGraphvizButton;
     private com.peterswing.advancedswing.searchtextfield.JSearchTextField searchAntlrTreeTextField;
     private javax.swing.JButton show100ImageButton;
+    private javax.swing.JButton show100ImageJGraphButton;
     private javax.swing.JButton show100TargetGraphImageButton;
     private javax.swing.JPanel targetGraphPanel;
     private javax.swing.JPanel targetJGraphPanel;
     private javax.swing.JPanel treePanel;
     private javax.swing.JButton zoomInButton;
+    private javax.swing.JButton zoomInJGraphButton;
     private javax.swing.JButton zoomInTargetGraphButton;
     private javax.swing.JButton zoomOutButton;
+    private javax.swing.JButton zoomOutJGraphButton;
     private javax.swing.JButton zoomOutTargetGraphButton;
     // End of variables declaration//GEN-END:variables
 
@@ -715,11 +895,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	}
 
 	private void buildJGraph(AstNode root) {
-		Object parent = graph.getDefaultParent();
-		exportDot(parent, )
-		mxCell newNode = (mxCell) graph.insertVertex(parent, null, "fuck", 40, 40, 150, 30);
-		mxCell newNode2 = (mxCell) graph.insertVertex(parent, null, "fuck", 140, 140, 150, 30);
-		graph.insertEdge(parent, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
+		//mxCell newNode2 = (mxCell) graph.insertVertex(null, null, "fuck", 140, 140, 150, 30);
+		//graph.insertEdge(null, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
+		buildJGraphNode(root, null);
 		graph.setCellsDisconnectable(false);
 		graph.getModel().beginUpdate();
 		mxMorphing morph = new mxMorphing(graphComponent, 20, 1.2, 20);
@@ -731,42 +909,15 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
 		morph.startAnimation();
 	}
-	
-	public static String exportDot(AstNode node) {
-		StringBuffer sb = new StringBuffer();
-		sb.append("digraph \"Grammar\" {\n"
-				+ "	graph [	"
-				+ "		fontname = \"Arial\",\n"
-				+ "		splines  = ortho,\n"
-				+ "		fontsize = 8,"
-				+ "		rankdir=\"LR\",\n"
-				+ "	];\n"
-				+ "	node [	"
-				+ "		shape    = \"box\",\n"
-				+ "     style    = \"filled\",\n"
-				+ "		fontname = \"Arial\"\n"
-				+ "];\n");
 
-		for (AstNode nn : node.getChildren()) {
-//			if (nn.getType().toLowerCase().contains("ruleblock")) {
-//				continue;
-//			}
-			exportDotChild(node.getType(), nn, sb);
+	private void buildJGraphNode(AstNode node, mxCell mxNode) {
+		mxCell rootNode = (mxCell) graph.insertVertex(null, null, node.getLabel(), 40, 40, 150, 30);
+		if (mxNode != null) {
+			graph.insertEdge(null, null, "", mxNode, rootNode, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
 		}
-		sb.append("}\n");
-		return sb.toString();
-	}
 
-	public static void exportDotChild(String currentNodeText, AstNode node, StringBuffer sb) {
-		String nodeText = processLabel(node);
-		String nodeID = node.getType() + "-" + (id++);
-		sb.append("\"" + nodeID + "\" [label=\"" + nodeText + "\"]\n");
-		sb.append("\"" + currentNodeText + "\" -> \"" + nodeID + "\"\n");
-//		if (node.getType().toLowerCase().contains("ruleblock")) {
-//			return;
-//		}
 		for (AstNode nn : node.getChildren()) {
-			exportDotChild(nodeID, nn, sb);
+			buildJGraphNode(nn, rootNode);
 		}
 	}
 
