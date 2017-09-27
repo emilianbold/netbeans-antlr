@@ -1,10 +1,9 @@
 package com.github.mcheung63.syntax.antlr4;
 
-import java.awt.Component;
 
+import com.github.mcheung63.ModuleLib;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
-import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 public class CallGraphComponent extends mxGraphComponent {
@@ -13,10 +12,11 @@ public class CallGraphComponent extends mxGraphComponent {
 		super(graph);
 	}
 
+	@Override
 	public mxInteractiveCanvas createCanvas() {
-		return new PeterSwingCanvas(this);
+		ModuleLib.log("createCanvas");
+		return new MyJGraphCanvas(this);
 	}
-
 
 	/*protected void paintBackground(Graphics g) {
 		double scale = this.getGraph().getView().getScale();
@@ -58,11 +58,13 @@ public class CallGraphComponent extends mxGraphComponent {
 
 		}
 	}*/
+	
+	/*@Override
 	public Component[] createComponents(mxCellState state) {
-		// if (getGraph().getModel().isVertex(state.getCell())) {
-		// return new Component[] { new JButton(state.getCell().toString()) };
-		// }
+		if (getGraph().getModel().isVertex(state.getCell())) {
+			return new Component[]{new JButton(state.getCell().toString())};
+		}
 
 		return null;
-	}
+	}*/
 }

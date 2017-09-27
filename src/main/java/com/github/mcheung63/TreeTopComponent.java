@@ -5,8 +5,6 @@
  */
 package com.github.mcheung63;
 
-import static com.github.mcheung63.AntlrLib.id;
-import static com.github.mcheung63.AntlrLib.processLabel;
 import com.github.mcheung63.syntax.antlr4.Ast;
 import com.github.mcheung63.syntax.antlr4.AstNode;
 import com.github.mcheung63.syntax.antlr4.CallGraphComponent;
@@ -133,6 +131,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
 		layoutButton.removeAll();
 		layoutButton.add(new JMenuItem("Hierarchical Layout"));
+		layoutButton.add(new JMenuItem("Compact tree"));
 		layoutButton.add(new JMenuItem("Circle Layout"));
 		layoutButton.add(new JMenuItem("Organic Layout"));
 		layoutButton.add(new JMenuItem("Compact Tree Layout"));
@@ -152,6 +151,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
         mainTabbedPane = new javax.swing.JTabbedPane();
         targetJGraphPanel = new javax.swing.JPanel();
         jToolBar4 = new javax.swing.JToolBar();
+        refreshTargetJgraphButton = new javax.swing.JButton();
         zoomOutJGraphButton = new javax.swing.JButton();
         show100ImageJGraphButton = new javax.swing.JButton();
         zoomInJGraphButton = new javax.swing.JButton();
@@ -190,6 +190,17 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
         targetJGraphPanel.setLayout(new java.awt.BorderLayout());
 
         jToolBar4.setRollover(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(refreshTargetJgraphButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.refreshTargetJgraphButton.text")); // NOI18N
+        refreshTargetJgraphButton.setFocusable(false);
+        refreshTargetJgraphButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        refreshTargetJgraphButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        refreshTargetJgraphButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshTargetJgraphButtonActionPerformed(evt);
+            }
+        });
+        jToolBar4.add(refreshTargetJgraphButton);
 
         org.openide.awt.Mnemonics.setLocalizedText(zoomOutJGraphButton, org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.zoomOutJGraphButton.text")); // NOI18N
         zoomOutJGraphButton.setFocusable(false);
@@ -676,9 +687,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 				AntlrLib.printAst("", root);
 
 				String dot = AntlrLib.exportDot(root);
-				buildJGraph(root);
 
-				System.out.println(dot);
 				File dotFile = File.createTempFile(targetFileName, ".dot");
 				File dotPngFile = File.createTempFile(targetFileName, ".png");
 				FileUtils.writeStringToFile(dotFile, dot, "UTF-8");
@@ -819,6 +828,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		} else if (str.equals("Stack Layout")) {
 			mxStackLayout layout = new mxStackLayout(graph);
 			layout.execute(cell);
+		} else if (str.equals("Compact tree")) {
+			mxCompactTreeLayout layout=new mxCompactTreeLayout(graph);
+			layout.execute(cell);
 		} else {
 			System.out.println("no this layout");
 		}
@@ -832,6 +844,58 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
 		morph.startAnimation();
     }//GEN-LAST:event_layoutButtonActionPerformed
+
+    private void refreshTargetJgraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTargetJgraphButtonActionPerformed
+      try {
+			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
+			if (jTextComponent == null) {
+				return;
+			}
+			Document doc = jTextComponent.getDocument();
+			DataObject dataObject = NbEditorUtilities.getDataObject(doc);
+			File targetFile = FileTypeG4VisualElement.maps.get(dataObject);
+			if (targetFile == null) {
+				return;
+			}
+			String targetFileName = targetFile.getName();
+
+			Tool tool = new Tool();
+			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());
+			if (ast.grammarType == ANTLRParser.COMBINED) {
+				Grammar grammar = tool.createGrammar(ast);
+				tool.process(grammar, false);
+
+				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(targetFile)));
+				lexer.removeErrorListeners();
+
+				CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+				ParserInterpreter parser = grammar.createParserInterpreter(tokenStream);
+				//parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+				String startRule = FileTypeG4VisualElement.startRules.get(dataObject);
+				Rule start = grammar.getRule(startRule);
+				if (start == null) {
+					return;
+				}
+				ParserRuleContext context = parser.parse(start.index);
+
+				ParseTreeWalker walker = new ParseTreeWalker();
+				GeneralParserListener listener = new GeneralParserListener(parser);
+				walker.walk(listener, context);
+
+				Ast astNode = listener.ast;
+				AstNode root = astNode.getRoot();
+				root.setLabel(targetFile.getName());
+				//AntlrLib.filterUnwantedSubNodes(root, new String[]{"ruleblock"});
+				//AntlrLib.removeOneLeafNodes(root);
+				AntlrLib.printAst("", root);
+
+				buildJGraph(root);
+				layoutButtonActionPerformed(null);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+    }//GEN-LAST:event_refreshTargetJgraphButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -857,6 +921,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private javax.swing.JButton refreshAntlrTreeButton;
     private javax.swing.JButton refreshGraphvizButton;
     private javax.swing.JButton refreshTargetGraphvizButton;
+    private javax.swing.JButton refreshTargetJgraphButton;
     private com.peterswing.advancedswing.searchtextfield.JSearchTextField searchAntlrTreeTextField;
     private javax.swing.JButton show100ImageButton;
     private javax.swing.JButton show100ImageJGraphButton;
@@ -895,8 +960,6 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	}
 
 	private void buildJGraph(AstNode root) {
-		//mxCell newNode2 = (mxCell) graph.insertVertex(null, null, "fuck", 140, 140, 150, 30);
-		//graph.insertEdge(null, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
 		buildJGraphNode(root, null);
 		graph.setCellsDisconnectable(false);
 		graph.getModel().beginUpdate();
@@ -913,7 +976,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	private void buildJGraphNode(AstNode node, mxCell mxNode) {
 		mxCell rootNode = (mxCell) graph.insertVertex(null, null, node.getLabel(), 40, 40, 150, 30);
 		if (mxNode != null) {
-			graph.insertEdge(null, null, "", mxNode, rootNode, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
+			graph.insertEdge(null, null, "", mxNode, rootNode, mxConstants.STYLE_STROKECOLOR + "=#000000;edgeStyle=elbowEdgeStyle;");
 		}
 
 		for (AstNode nn : node.getChildren()) {
