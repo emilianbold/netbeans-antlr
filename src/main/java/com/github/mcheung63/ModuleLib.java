@@ -16,13 +16,18 @@
  */
 package com.github.mcheung63;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JComponent;
+import javax.swing.text.JTextComponent;
+import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.api.io.IOProvider;
 import org.netbeans.api.io.InputOutput;
+import org.openide.loaders.DataObject;
+import org.openide.windows.TopComponent;
 
 public class ModuleLib {
 
@@ -89,4 +94,16 @@ public class ModuleLib {
 		}
 		return null;
 	}
+
+//	public static File getCurrentFile() {
+//		TopComponent activeTC = TopComponent.getRegistry().getActivated();
+//		if (activeTC == null) {
+//			return null;
+//		}
+//		DataObject dataObject = activeTC.getLookup().lookup(DataObject.class);
+//		if (dataObject == null) {
+//			return null;
+//		}
+//		return new File(dataObject.getPrimaryFile().getPath());
+//	}
 }

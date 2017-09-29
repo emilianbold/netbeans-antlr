@@ -109,12 +109,17 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			DataObject dataObject = NbEditorUtilities.getDataObject(doc);
 			File targetFile = FileTypeG4VisualElement.maps.get(dataObject);
 			if (targetFile == null) {
+				ModuleLib.log("targetFile is null");
 				return;
 			}
 			FileObject fileObject = FileUtil.toFileObject(targetFile);
 			DataObject targetDataObject = DataObject.find(fileObject);
 			EditorCookie ecA = targetDataObject.getLookup().lookup(EditorCookie.class);
 			Document targetDoc = ecA.getDocument();
+			if (targetDoc == null) {
+				ModuleLib.log("targetDoc is null");
+				return;
+			}
 
 			Tool tool = new Tool();
 			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());

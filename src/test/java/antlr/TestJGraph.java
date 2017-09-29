@@ -1,6 +1,6 @@
 package antlr;
 
-import com.github.mcheung63.syntax.antlr4.CallGraphComponent;
+import com.github.mcheung63.syntax.antlr4.jgraph.MyGraphComponent;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.util.mxMorphing;
@@ -46,7 +46,7 @@ public class TestJGraph {
 		graph.insertEdge(null, null, "", newNode, newNode2, mxConstants.STYLE_STROKECOLOR + "=#ff0000;edgeStyle=elbowEdgeStyle;");
 
 		graph.setCellsDisconnectable(false);
-		CallGraphComponent graphComponent = new CallGraphComponent(graph);
+		MyGraphComponent graphComponent = new MyGraphComponent(graph);
 
 		graph.getModel().beginUpdate();
 

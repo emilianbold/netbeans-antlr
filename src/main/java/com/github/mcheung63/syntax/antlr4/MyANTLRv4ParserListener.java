@@ -39,12 +39,6 @@ public class MyANTLRv4ParserListener extends ANTLRv4ParserBaseListener {
 		Token e = ctx.getStop();
 
 		if (ruleName.equals("ruleSpec")) {
-//			if (s != null) {
-//				System.out.println("\t" + s.getStartIndex() + ", " + s.getStopIndex() + ", " + s.getText());
-//			}
-//			if (e != null) {
-//				System.out.println("\t\t" + e.getStartIndex() + ", " + e.getStopIndex() + ", " + e.getText());
-//			}
 			TokenDocumentLocation tokenDocumentLocation = new TokenDocumentLocation();
 			tokenDocumentLocation.rule = ruleName;
 			tokenDocumentLocation.text = text.split(":")[0];

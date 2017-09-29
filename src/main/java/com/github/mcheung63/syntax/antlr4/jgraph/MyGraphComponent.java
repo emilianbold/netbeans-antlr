@@ -1,4 +1,4 @@
-package com.github.mcheung63.syntax.antlr4;
+package com.github.mcheung63.syntax.antlr4.jgraph;
 
 
 import com.github.mcheung63.ModuleLib;
@@ -6,9 +6,9 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.view.mxGraph;
 
-public class CallGraphComponent extends mxGraphComponent {
+public class MyGraphComponent extends mxGraphComponent {
 
-	public CallGraphComponent(mxGraph graph) {
+	public MyGraphComponent(mxGraph graph) {
 		super(graph);
 	}
 

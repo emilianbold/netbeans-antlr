@@ -7,9 +7,12 @@ package com.github.mcheung63;
 
 import com.github.mcheung63.syntax.antlr4.Ast;
 import com.github.mcheung63.syntax.antlr4.AstNode;
-import com.github.mcheung63.syntax.antlr4.CallGraphComponent;
+import com.github.mcheung63.syntax.antlr4.jgraph.MyGraphComponent;
 import com.github.mcheung63.syntax.antlr4.GeneralParserListener;
 import com.github.mcheung63.syntax.antlr4.MyANTLRv4ParserListener;
+import com.github.mcheung63.syntax.antlr4.jgraph.MyJGraphCanvas;
+import com.mxgraph.canvas.mxICanvas;
+import com.mxgraph.canvas.mxImageCanvas;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxCompactTreeLayout;
@@ -26,6 +29,7 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.peterswing.CommonLib;
 import com.peterswing.advancedswing.jprogressbardialog.JProgressBarDialog;
@@ -52,7 +56,6 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.apache.commons.io.FileUtils;
 import org.netbeans.api.editor.EditorRegistry;
-import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -64,10 +67,10 @@ import org.openide.util.Exceptions;
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties(
-		dtd = "-//com.github.mcheung63//Tree//EN",
-		autostore = false
-)
+//@ConvertAsProperties(
+//		dtd = "-//com.github.mcheung63//Tree//EN",
+//		autostore = false
+//)
 @TopComponent.Description(
 		preferredID = "TreeTopComponent",
 		iconBase = "com/github/mcheung63/antlr.png",
@@ -113,8 +116,20 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		public boolean isCellFoldable(Object cell, boolean collapse) {
 			return false;
 		}
+
+		public void drawState(mxICanvas canvas, mxCellState state, boolean drawLabel) {
+			String label = (drawLabel) ? state.getLabel() : "";
+
+			if (getModel().isVertex(state.getCell()) && canvas instanceof mxImageCanvas && ((mxImageCanvas) canvas).getGraphicsCanvas() instanceof MyJGraphCanvas) {
+				((MyJGraphCanvas) ((mxImageCanvas) canvas).getGraphicsCanvas()).drawVertex(state, label);
+			} else if (getModel().isVertex(state.getCell()) && canvas instanceof MyJGraphCanvas) {
+				((MyJGraphCanvas) canvas).drawVertex(state, label);
+			} else {
+				super.drawState(canvas, state, drawLabel);
+			}
+		}
 	};
-	CallGraphComponent graphComponent = new CallGraphComponent(graph);
+	MyGraphComponent graphComponent = new MyGraphComponent(graph);
 
 	public TreeTopComponent() {
 		initComponents();
@@ -644,17 +659,17 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 
     private void refreshTargetGraphvizButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTargetGraphvizButtonActionPerformed
 		try {
+			File targetFile = getTargetFile();
+			if (targetFile == null) {
+				return;
+			}
+			String targetFileName = targetFile.getName();
+
 			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
 			if (jTextComponent == null) {
 				return;
 			}
-			Document doc = jTextComponent.getDocument();
-			DataObject dataObject = NbEditorUtilities.getDataObject(doc);
-			File targetFile = FileTypeG4VisualElement.maps.get(dataObject);
-			String targetFileName = targetFile.getName();
-			if (targetFile == null) {
-				return;
-			}
+			DataObject dataObject = NbEditorUtilities.getDataObject(jTextComponent.getDocument());
 
 			Tool tool = new Tool();
 			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());
@@ -829,7 +844,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 			mxStackLayout layout = new mxStackLayout(graph);
 			layout.execute(cell);
 		} else if (str.equals("Compact tree")) {
-			mxCompactTreeLayout layout=new mxCompactTreeLayout(graph);
+			mxCompactTreeLayout layout = new mxCompactTreeLayout(graph);
 			layout.execute(cell);
 		} else {
 			System.out.println("no this layout");
@@ -846,7 +861,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     }//GEN-LAST:event_layoutButtonActionPerformed
 
     private void refreshTargetJgraphButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTargetJgraphButtonActionPerformed
-      try {
+		try {
 			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
 			if (jTextComponent == null) {
 				return;
@@ -937,14 +952,17 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private javax.swing.JButton zoomOutTargetGraphButton;
     // End of variables declaration//GEN-END:variables
 
-	void writeProperties(java.util.Properties p) {
-		p.setProperty("version", "1.0");
-	}
-
-	void readProperties(java.util.Properties p) {
-		String version = p.getProperty("version");
-	}
-
+//	void writeProperties(java.util.Properties p) {
+//		File targetFile = getTargetFile();
+//		if (targetFile == null) {
+//			return;
+//		}
+//		p.setProperty("targetFile", targetFile.getAbsolutePath());
+//	}
+//
+//	void readProperties(java.util.Properties p) {
+//		String filePath = p.getProperty("targetFile");
+//	}
 //	@Override
 //	public void resultChanged(LookupEvent le) {
 //		Collection<? extends DataObject> dataObjects = result.allInstances();
@@ -962,6 +980,8 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	private void buildJGraph(AstNode root) {
 		buildJGraphNode(root, null);
 		graph.setCellsDisconnectable(false);
+		graph.setAllowDanglingEdges(false);
+		graph.removeCells();
 		graph.getModel().beginUpdate();
 		mxMorphing morph = new mxMorphing(graphComponent, 20, 1.2, 20);
 		morph.addListener(mxEvent.DONE, new mxEventSource.mxIEventListener() {
@@ -974,14 +994,24 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	}
 
 	private void buildJGraphNode(AstNode node, mxCell mxNode) {
-		mxCell rootNode = (mxCell) graph.insertVertex(null, null, node.getLabel(), 40, 40, 150, 30);
+		mxCell newNode = (mxCell) graph.insertVertex(null, node.getLabel(), node.getLabel(), 40, 40, 150, 30);
 		if (mxNode != null) {
-			graph.insertEdge(null, null, "", mxNode, rootNode, mxConstants.STYLE_STROKECOLOR + "=#000000;edgeStyle=elbowEdgeStyle;");
+			graph.insertEdge(null, mxNode + " > " + newNode, "", mxNode, newNode, mxConstants.STYLE_STROKECOLOR + "=#000000;edgeStyle=elbowEdgeStyle;");
 		}
 
 		for (AstNode nn : node.getChildren()) {
-			buildJGraphNode(nn, rootNode);
+			buildJGraphNode(nn, newNode);
 		}
+	}
+
+	private File getTargetFile() {
+		JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
+		if (jTextComponent == null) {
+			return null;
+		}
+		Document doc = jTextComponent.getDocument();
+		DataObject dataObject = NbEditorUtilities.getDataObject(doc);
+		return FileTypeG4VisualElement.maps.get(dataObject);
 	}
 
 }

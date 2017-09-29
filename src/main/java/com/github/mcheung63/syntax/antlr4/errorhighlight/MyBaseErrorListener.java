@@ -32,6 +32,9 @@ public class MyBaseErrorListener extends BaseErrorListener {
 		compilerError = true;
 
 		Token offendingToken = (Token) offendingSymbol;
+		if (offendingToken == null) {
+			return;
+		}
 		int start = offendingToken.getStartIndex();
 		int stop = offendingToken.getStopIndex();
 		if (start > stop) {

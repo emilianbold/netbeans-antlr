@@ -11,20 +11,25 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.text.JTextComponent;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarRootAST;
 import org.apache.commons.io.IOUtils;
+import org.netbeans.api.editor.EditorRegistry;
+import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.awt.UndoRedo;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.NbPreferences;
 import org.openide.windows.TopComponent;
 
 @MultiViewElement.Registration(
@@ -82,13 +87,6 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         jLabel3 = new javax.swing.JLabel();
         startRuleComboBox = new javax.swing.JComboBox<>();
         refreshStartRuleButton = new javax.swing.JButton();
-        treePanel = new javax.swing.JPanel();
-        refreshTreeButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        contentTextArea = new javax.swing.JTextArea();
-        browseTestFileButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        startRuleTextField = new javax.swing.JTextField();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -103,11 +101,6 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(refreshRealTimeFileButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshRealTimeFileButton.text")); // NOI18N
-        refreshRealTimeFileButton.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentShown(java.awt.event.ComponentEvent evt) {
-                refreshRealTimeFileButtonComponentShown(evt);
-            }
-        });
         refreshRealTimeFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 refreshRealTimeFileButtonActionPerformed(evt);
@@ -121,18 +114,8 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
                 startRuleComboBoxItemStateChanged(evt);
             }
         });
-        startRuleComboBox.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentShown(java.awt.event.ComponentEvent evt) {
-                startRuleComboBoxComponentShown(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(refreshStartRuleButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshStartRuleButton.text")); // NOI18N
-        refreshStartRuleButton.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentShown(java.awt.event.ComponentEvent evt) {
-                refreshStartRuleButtonComponentShown(evt);
-            }
-        });
         refreshStartRuleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 refreshStartRuleButtonActionPerformed(evt);
@@ -178,304 +161,21 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.settingPanel.TabConstraints.tabTitle"), settingPanel); // NOI18N
 
-        refreshTreeButton.setLabel(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.refreshTreeButton.label")); // NOI18N
-        refreshTreeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                refreshTreeButtonActionPerformed(evt);
-            }
-        });
-
-        contentTextArea.setColumns(20);
-        contentTextArea.setRows(5);
-        contentTextArea.setText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.contentTextArea.text")); // NOI18N
-        jScrollPane1.setViewportView(contentTextArea);
-
-        org.openide.awt.Mnemonics.setLocalizedText(browseTestFileButton, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.browseTestFileButton.text")); // NOI18N
-        browseTestFileButton.setToolTipText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.browseTestFileButton.toolTipText")); // NOI18N
-        browseTestFileButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseTestFileButtonActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.jLabel1.text")); // NOI18N
-
-        startRuleTextField.setText(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.startRuleTextField.text")); // NOI18N
-
-        javax.swing.GroupLayout treePanelLayout = new javax.swing.GroupLayout(treePanel);
-        treePanel.setLayout(treePanelLayout);
-        treePanelLayout.setHorizontalGroup(
-            treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(treePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(treePanelLayout.createSequentialGroup()
-                        .addComponent(browseTestFileButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(refreshTreeButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(startRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 293, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        treePanelLayout.setVerticalGroup(
-            treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(treePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(treePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(refreshTreeButton)
-                    .addComponent(browseTestFileButton)
-                    .addComponent(jLabel1)
-                    .addComponent(startRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(FileTypeG4VisualElement.class, "FileTypeG4VisualElement.treePanel.TabConstraints.tabTitle"), treePanel); // NOI18N
-
         add(jTabbedPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void refreshTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTreeButtonActionPerformed
-		/*String base = "/Users/peter/Desktop";
-		new File(base + "/temp").delete();
-		new File(base + "/temp").mkdir();
-		File file = new File(obj.getPrimaryFile().getPath());
-		try {
-			Files.copy(file.toPath(), new File(base + "/temp/" + file.getName()).toPath());
-		} catch (IOException ex) {
-			ModuleLib.log("exception=" + ModuleLib.printException(ex));
-		}
-		try {
-			File f = new File(base + "/temp/" + file.getName());
-			GenericParser gp = new GenericParser(f);
-			String s = FileUtils.loadFileContent("HelloWorld.java");
-
-			DefaultTreeListener dlist = new DefaultTreeListener();
-
-			gp.setListener(dlist);
-			gp.compile();
-
-			ParserRuleContext ctx = gp.parse(s);
-
-			Ast ast = dlist.getAst();
-			ModuleLib.log(ast.toDot());
-		} catch (Exception ex) {
-			ModuleLib.log("exception=" + ModuleLib.printException(ex));
-		}*/
-
-//		try {
-//			File file = new File(obj.getPrimaryFile().getPath());
-//			ModuleLib.log(file.getAbsolutePath());
-////			System.out.println(Paths.get(getClass().getResource("Calculator.g4").toURI()));
-////			String content = new String(Files.readAllBytes(Paths.get(getClass().getResource("Calculator.g4").toURI())));
-//			GenericParser gp = new GenericParser(file);
-//			DefaultTreeListener treeListener = new DefaultTreeListener();
-//			gp.setListener(treeListener);
-//			gp.compile();
-//			ParserRuleContext ctx = gp.parse(contentTextArea.getText());
-//			Ast ast = treeListener.getAst();
-//			List<AstNode> nodes = ast.getNodes();
-//			for (AstNode n : nodes) {
-//				ModuleLib.log(n);
-//				//loop("", n);
-//			}
-//			System.out.println(ast.toDot());
-//		} catch (Exception ex) {
-//			ModuleLib.log(ex.getMessage());
-//		}
-
-		/*
-		try {
-			File file = new File(obj.getPrimaryFile().getPath());
-			File tempDir = Files.createTempDir();
-			
-			startRuleName = startRuleTextField.getText();
-			grammarName = file.getName();
-			String lexerName = grammarName + "Lexer";
-			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			Class<? extends Lexer> lexerClass = null;
-			try {
-				lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
-			} catch (java.lang.ClassNotFoundException cnfe) {
-				// might be pure lexer grammar; no Lexer suffix then
-				lexerName = grammarName;
-				try {
-					lexerClass = cl.loadClass(lexerName).asSubclass(Lexer.class);
-				} catch (ClassNotFoundException cnfe2) {
-					ModuleLib.log("Can't load " + lexerName + " as lexer or parser");
-					return;
-				}
-			}
-
-			Constructor<? extends Lexer> lexerCtor = lexerClass.getConstructor(CharStream.class);
-			Lexer lexer = lexerCtor.newInstance((CharStream) null);
-
-			Class<? extends Parser> parserClass = null;
-			Parser parser = null;
-			if (!startRuleName.equals(LEXER_START_RULE_NAME)) {
-				String parserName = grammarName + "Parser";
-				parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
-				Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-				parser = parserCtor.newInstance((TokenStream) null);
-			}
-
-			String encoding = "UTF-8";
-			Charset charset = (encoding == null ? Charset.defaultCharset() : Charset.forName(encoding));
-			List<String> inputFiles = new ArrayList<String>();
-			if (inputFiles.size() == 0) {
-				CharStream charStream = CharStreams.fromStream(System.in, charset);
-				process(lexer, parserClass, parser, charStream);
-				return;
-			}
-			for (String inputFile : inputFiles) {
-				CharStream charStream = CharStreams.fromPath(Paths.get(inputFile), charset);
-				if (inputFiles.size() > 1) {
-					System.err.println(inputFile);
-				}
-				process(lexer, parserClass, parser, charStream);
-			}
-		} catch (Exception ex) {
-			ModuleLib.log(ex.getMessage());
-		}
-		 */
-		try {
-			/*
-			File file = new File(obj.getPrimaryFile().getPath());
-			ModuleLib.log("file=" + file.getAbsolutePath());
-			String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-			GenericParser gp = new GenericParser(content);
-			DefaultTreeListener treeListener = new DefaultTreeListener();
-			gp.setListener(treeListener);
-			gp.compile();
-			 */
-
-//			MemoryTupleSet set = gp.getAllCompiledObjects();
-//			for (MemoryTuple tup : set) {
-//				System.out.println("tuple name " + tup.getClassName());
-//				System.out.println("source " + tup.getSource().getClassName());
-//				for (MemoryByteCode mc : tup.getByteCodeObjects()) {
-//					Objects.requireNonNull(mc, "MemoryByteCode must not be null");
-//					System.out.println("bc name: " + mc.getClassName());
-//
-//					if (!mc.isInnerClass()) {
-//						mc.getClassName().equals(tup.getSource().getClassName());
-//					} else {
-//						mc.getClassName().startsWith(tup.getSource().getClassName());
-//					}
-//				}
-//			}
-
-			/*
-			ParserRuleContext ctx = gp.parse("1+2*(3+4)");
-			Ast ast = treeListener.getAst();
-			List<AstNode> nodes = ast.getNodes();
-			for (AstNode n : nodes) {
-				loop("", n);
-			}
-			ModuleLib.log(ast.toDot());
-			 */
-		} catch (Exception ex) {
-			ModuleLib.log(ex.getMessage());
-		}
-    }//GEN-LAST:event_refreshTreeButtonActionPerformed
-
-//	void loop(String s, AstNode n) {
-//		ModuleLib.log(s + "n=" + n);
-//		for (AstNode nn : n.getChildren()) {
-//			loop(s + "    ", nn);
-//		}
-//	}
-
-	/*
-	void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, CharStream input) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
-		lexer.setInputStream(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-		tokens.fill();
-
-		if (showTokens) {
-			for (Token tok : tokens.getTokens()) {
-				if (tok instanceof CommonToken) {
-					System.out.println(((CommonToken) tok).toString(lexer));
-				} else {
-					System.out.println(tok.toString());
-				}
-			}
-		}
-
-		if (startRuleName.equals(LEXER_START_RULE_NAME)) {
-			return;
-		}
-
-		if (diagnostics) {
-			parser.addErrorListener(new DiagnosticErrorListener());
-			parser.getInterpreter().setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
-		}
-
-		//if (printTree || gui || psFile != null) {
-		if (gui) {
-			parser.setBuildParseTree(true);
-		}
-
-		if (SLL) { // overrides diagnostics
-			parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-		}
-
-		parser.setTokenStream(tokens);
-		parser.setTrace(trace);
-
-		try {
-			Method startRule = parserClass.getMethod(startRuleName);
-			ParserRuleContext tree = (ParserRuleContext) startRule.invoke(parser, (Object[]) null);
-
-			if (printTree) {
-				System.out.println(tree.toStringTree(parser));
-			}
-			if (gui) {
-				Trees.inspect(tree, parser);
-			}
-			if (psFile != null) {
-				Trees.save(tree, parser, psFile); // Generate postscript
-			}
-		} catch (NoSuchMethodException nsme) {
-			System.err.println("No method for rule " + startRuleName + " or it has arguments");
-		}
-	}
-	 */
-
-    private void browseTestFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseTestFileButtonActionPerformed
-//		final JFileChooser fc = new JFileChooser();
-//		int returnVal = fc.showOpenDialog(null);
-//
-//		if (returnVal == JFileChooser.APPROVE_OPTION) {
-//			File file = fc.getSelectedFile();
-//			try {
-//				contentTextArea.setText(FileUtils.readFileToString(file, "UTF-8"));
-//			} catch (IOException ex) {
-//				Exceptions.printStackTrace(ex);
-//			}
-//			refreshTreeButtonActionPerformed(null);
-//		}
-    }//GEN-LAST:event_browseTestFileButtonActionPerformed
-
     private void refreshRealTimeFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshRealTimeFileButtonActionPerformed
+
 		initComboBox();
     }//GEN-LAST:event_refreshRealTimeFileButtonActionPerformed
-
-    private void refreshRealTimeFileButtonComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_refreshRealTimeFileButtonComponentShown
-		initComboBox();
-    }//GEN-LAST:event_refreshRealTimeFileButtonComponentShown
 
     private void comboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBoxItemStateChanged
 		if (evt.getStateChange() == ItemEvent.SELECTED) {
 			DataObject dataObject = lkp.lookup(DataObject.class);
 			File file = (File) evt.getItem();
 			maps.put(dataObject, file);
+			File currentFile = new File(lkp.lookup(DataObject.class).getPrimaryFile().getPath());
+			NbPreferences.forModule(FileTypeG4VisualElement.class).put("file-" + currentFile.getAbsolutePath(), file.getAbsolutePath());
 		}
     }//GEN-LAST:event_comboBoxItemStateChanged
 
@@ -484,60 +184,96 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 			DataObject dataObject = lkp.lookup(DataObject.class);
 			String rule = (String) evt.getItem();
 			startRules.put(dataObject, rule);
+
+			File currentFile = new File(lkp.lookup(DataObject.class).getPrimaryFile().getPath());
+			NbPreferences.forModule(FileTypeG4VisualElement.class).put("startRule-" + currentFile.getAbsolutePath(), rule);
 		}
     }//GEN-LAST:event_startRuleComboBoxItemStateChanged
-
-    private void refreshStartRuleButtonComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_refreshStartRuleButtonComponentShown
-		initStartRuleCombo();
-    }//GEN-LAST:event_refreshStartRuleButtonComponentShown
 
     private void refreshStartRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshStartRuleButtonActionPerformed
 		initStartRuleCombo();
     }//GEN-LAST:event_refreshStartRuleButtonActionPerformed
 
-    private void startRuleComboBoxComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_startRuleComboBoxComponentShown
-		initStartRuleCombo();
-    }//GEN-LAST:event_startRuleComboBoxComponentShown
-
 	private void initComboBox() {
 		synchronized (realTimeComboModel.files) {
 			realTimeComboModel.files.clear();
+			File currentFile = new File(lkp.lookup(DataObject.class).getPrimaryFile().getPath());
+			String savedPath = NbPreferences.forModule(FileTypeG4VisualElement.class).get("file-" + currentFile.getAbsolutePath(), null);
 
 			Set<TopComponent> comps = TopComponent.getRegistry().getOpened();
+			boolean bingo = false;
+			File selectedFile = null;
 			for (TopComponent tc : comps) {
 				Node[] arr = tc.getActivatedNodes();
 				if (arr != null) {
 					for (int j = 0; j < arr.length; j++) {
 						DataObject dataObject = (DataObject) arr[j].getCookie(DataObject.class);
 						File file = new File(dataObject.getPrimaryFile().getPath());
-						if (file.exists() && file.isFile()/* && !temp.contains(file.getName())*/) {
+						if (file.exists() && file.isFile() && !file.equals(currentFile)) {
 							realTimeComboModel.files.add(file);
+							if (file.getAbsolutePath().equals(savedPath)) {
+								selectedFile = file;
+								bingo = true;
+							}
 						}
 					}
 				}
-//			}
 			}
+			if (!bingo && savedPath != null) {
+				selectedFile = new File(savedPath);
+				realTimeComboModel.files.add(selectedFile);
+			}
+			comboBox.setSelectedItem(selectedFile);
 		}
 
 		comboBox.setRenderer(new RealTimeComboRenderer()); // if no this line, combobox will show nothing after refeshing with few files
 	}
 
+	private void initStartRuleCombo() {
+		try {
+			ModuleLib.log("initStartRuleCombo");
+			DataObject dataObject = lkp.lookup(DataObject.class);
+			String content = IOUtils.toString(new FileReader(new File(dataObject.getPrimaryFile().getPath())));
+			Tool tool = new Tool();
+			GrammarRootAST ast = tool.parseGrammarFromString(content);
+			startRuleComboBox.removeAllItems();
+
+			boolean bingo = false;
+			File currentFile = new File(lkp.lookup(DataObject.class).getPrimaryFile().getPath());
+			String startRule = NbPreferences.forModule(FileTypeG4VisualElement.class).get("startRule-" + currentFile.getAbsolutePath(), null);
+			ModuleLib.log("startRule=" + startRule);
+			if (ast.grammarType == ANTLRParser.COMBINED) {
+				Grammar grammar = tool.createGrammar(ast);
+				tool.process(grammar, false);
+				for (String rule : grammar.getRuleNames()) {
+					startRuleComboBox.addItem(rule);
+					if (rule.equals(startRule)) {
+						startRule = rule;
+						bingo = true;
+					}
+				}
+			}
+
+			if (!bingo && startRule != null) {
+				startRuleComboBox.addItem(startRule);
+			}
+			startRuleComboBox.setSelectedItem(startRule);
+		} catch (FileNotFoundException ex) {
+			Exceptions.printStackTrace(ex);
+		} catch (IOException ex) {
+			Exceptions.printStackTrace(ex);
+		}
+	}
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton browseTestFileButton;
     private javax.swing.JComboBox<String> comboBox;
-    private javax.swing.JTextArea contentTextArea;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton refreshRealTimeFileButton;
     private javax.swing.JButton refreshStartRuleButton;
-    private javax.swing.JButton refreshTreeButton;
     private javax.swing.JPanel settingPanel;
     private javax.swing.JComboBox<String> startRuleComboBox;
-    private javax.swing.JTextField startRuleTextField;
-    private javax.swing.JPanel treePanel;
     // End of variables declaration//GEN-END:variables
 
 	@Override
@@ -571,6 +307,7 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 	@Override
 	public void componentShowing() {
 		refreshRealTimeFileButtonActionPerformed(null);
+		refreshStartRuleButtonActionPerformed(null);
 	}
 
 	@Override
@@ -598,31 +335,6 @@ public final class FileTypeG4VisualElement extends JPanel implements MultiViewEl
 	@Override
 	public CloseOperationState canCloseElement() {
 		return CloseOperationState.STATE_OK;
-	}
-
-	private void initStartRuleCombo() {
-		try {
-			//		JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
-//		if (jTextComponent == null) {
-//			return;
-//		}
-			DataObject dataObject = lkp.lookup(DataObject.class);
-			String content = IOUtils.toString(new FileReader(new File(dataObject.getPrimaryFile().getPath())));
-			Tool tool = new Tool();
-			GrammarRootAST ast = tool.parseGrammarFromString(content);
-			startRuleComboBox.removeAllItems();
-			if (ast.grammarType == ANTLRParser.COMBINED) {
-				Grammar grammar = tool.createGrammar(ast);
-				tool.process(grammar, false);
-				for (String rule : grammar.getRuleNames()) {
-					startRuleComboBox.addItem(rule);
-				}
-			}
-		} catch (FileNotFoundException ex) {
-			Exceptions.printStackTrace(ex);
-		} catch (IOException ex) {
-			Exceptions.printStackTrace(ex);
-		}
 	}
 
 }
