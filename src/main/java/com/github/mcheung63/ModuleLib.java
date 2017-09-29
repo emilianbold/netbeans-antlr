@@ -42,7 +42,9 @@ public class ModuleLib {
 	}
 
 	public static void log(Object obj) {
-		log(obj.toString());
+		if (obj != null) {
+			log(obj.toString());
+		}
 	}
 
 	public static void logNoNewLine(String str) {

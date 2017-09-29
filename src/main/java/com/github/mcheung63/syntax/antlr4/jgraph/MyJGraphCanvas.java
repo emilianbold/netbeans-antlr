@@ -1,5 +1,6 @@
 package com.github.mcheung63.syntax.antlr4.jgraph;
 
+import com.github.mcheung63.syntax.antlr4.AstNode;
 import java.awt.Color;
 import java.awt.Font;
 
@@ -19,7 +20,7 @@ public class MyJGraphCanvas extends mxInteractiveCanvas {
 
 	protected mxGraphComponent graphComponent;
 
-	static Color borderColor = Color.red;//new Color(176, 176, 176);
+	static Color borderColor = new Color(176, 176, 176);
 	static Color backgroundcolor = new Color(239, 239, 239);
 
 	public MyJGraphCanvas(mxGraphComponent graphComponent) {
@@ -33,8 +34,8 @@ public class MyJGraphCanvas extends mxInteractiveCanvas {
 		label.setFont(new Font("arial", Font.PLAIN, 10));
 	}
 
-	public void drawVertex(mxCellState state, String label) {
-		this.label.setText(state.getLabel());
+	public void drawVertex(mxCellState state, AstNode node) {
+		this.label.setText(node.getType() + "\n" + node.getLabel());
 		rendererPane.paintComponent(g, this.label, graphComponent, (int) (state.getX() + translate.getX()), (int) (state.getY() + translate.getY()), (int) state.getWidth(), (int) state.getHeight(), true);
 	}
 

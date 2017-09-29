@@ -106,9 +106,6 @@ public class AntlrLib {
 				+ "];\n");
 
 		for (AstNode nn : node.getChildren()) {
-//			if (nn.getType().toLowerCase().contains("ruleblock")) {
-//				continue;
-//			}
 			exportDotChild(node.getType(), nn, sb);
 		}
 		sb.append("}\n");
@@ -120,26 +117,11 @@ public class AntlrLib {
 		String nodeID = node.getType() + "-" + (id++);
 		sb.append("\"" + nodeID + "\" [label=\"" + nodeText + "\"]\n");
 		sb.append("\"" + currentNodeText + "\" -> \"" + nodeID + "\"\n");
-//		if (node.getType().toLowerCase().contains("ruleblock")) {
-//			return;
-//		}
 		for (AstNode nn : node.getChildren()) {
 			exportDotChild(nodeID, nn, sb);
 		}
 	}
 
-//	private void rank(TreeNode<Tree> rootNode, StringBuffer sb, String lastDotNode, HashMap<Integer, List<String>> nodesInLevel, int level) {
-//		String nodeText = rootNode.object.getText();
-//		List<String> list = nodesInLevel.get(level);
-//		if (list == null) {
-//			list = new ArrayList<String>();
-//			nodesInLevel.put(level, list);
-//		}
-//		list.add(nodeText);
-//		for (int x = 0; x < rootNode.children.size(); x++) {
-//			rank(rootNode.children.get(x), sb, lastDotNode, nodesInLevel, level + 1);
-//		}
-//	}
 	public static String processLabel(AstNode node) {
 		String rule = node.getType();
 		String label = node.getLabel();

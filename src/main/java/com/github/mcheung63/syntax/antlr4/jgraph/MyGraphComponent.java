@@ -1,20 +1,17 @@
 package com.github.mcheung63.syntax.antlr4.jgraph;
 
-
-import com.github.mcheung63.ModuleLib;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.view.mxGraph;
 
 public class MyGraphComponent extends mxGraphComponent {
-
+	
 	public MyGraphComponent(mxGraph graph) {
 		super(graph);
 	}
-
+	
 	@Override
 	public mxInteractiveCanvas createCanvas() {
-		ModuleLib.log("createCanvas");
 		return new MyJGraphCanvas(this);
 	}
 
@@ -58,8 +55,7 @@ public class MyGraphComponent extends mxGraphComponent {
 
 		}
 	}*/
-	
-	/*@Override
+ /*@Override
 	public Component[] createComponents(mxCellState state) {
 		if (getGraph().getModel().isVertex(state.getCell())) {
 			return new Component[]{new JButton(state.getCell().toString())};

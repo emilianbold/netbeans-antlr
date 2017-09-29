@@ -99,12 +99,18 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	AntlrTreeNode rootNode = new AntlrTreeNode("Grammar", "Grammar");
 	AntlrTreeModel treeModel = new AntlrTreeModel(rootNode);
 	mxGraph graph = new mxGraph() {
-		public boolean isPort(Object cell) {
-			mxGeometry geo = getCellGeometry(cell);
+//		public boolean isPort(Object cell) {
+//			mxGeometry geo = getCellGeometry(cell);
+//
+//			return (geo != null) ? geo.isRelative() : false;
+//		}
 
-			return (geo != null) ? geo.isRelative() : false;
+		@Override
+		public boolean isCellMovable(Object cell) {
+			return false;
 		}
 
+		@Override
 		public String getToolTipForCell(Object cell) {
 			if (model.isEdge(cell)) {
 				return convertValueToString(model.getTerminal(cell, true)) + " -> " + convertValueToString(model.getTerminal(cell, false));
@@ -113,19 +119,31 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 			return super.getToolTipForCell(cell);
 		}
 
+		@Override
 		public boolean isCellFoldable(Object cell, boolean collapse) {
 			return false;
 		}
 
+		@Override
 		public void drawState(mxICanvas canvas, mxCellState state, boolean drawLabel) {
-			String label = (drawLabel) ? state.getLabel() : "";
+			mxCell mxCell = (mxCell) state.getCell();
+			if (mxCell != null) {
+				if (mxCell.getValue() != null) {
+					ModuleLib.log(mxCell.getValue().getClass());
+				}
+				if (mxCell.getValue() instanceof AstNode) {
+					AstNode node = (AstNode) ((mxCell) state.getCell()).getValue();
 
-			if (getModel().isVertex(state.getCell()) && canvas instanceof mxImageCanvas && ((mxImageCanvas) canvas).getGraphicsCanvas() instanceof MyJGraphCanvas) {
-				((MyJGraphCanvas) ((mxImageCanvas) canvas).getGraphicsCanvas()).drawVertex(state, label);
-			} else if (getModel().isVertex(state.getCell()) && canvas instanceof MyJGraphCanvas) {
-				((MyJGraphCanvas) canvas).drawVertex(state, label);
-			} else {
-				super.drawState(canvas, state, drawLabel);
+					if (getModel().isVertex(state.getCell()) && canvas instanceof mxImageCanvas && ((mxImageCanvas) canvas).getGraphicsCanvas() instanceof MyJGraphCanvas) {
+						((MyJGraphCanvas) ((mxImageCanvas) canvas).getGraphicsCanvas()).drawVertex(state, node);
+					} else if (getModel().isVertex(state.getCell()) && canvas instanceof MyJGraphCanvas) {
+						((MyJGraphCanvas) canvas).drawVertex(state, node);
+					} else {
+						super.drawState(canvas, state, drawLabel);
+					}
+				}else{
+					super.drawState(canvas, state, drawLabel);
+				}
 			}
 		}
 	};
@@ -136,6 +154,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		setName(Bundle.CTL_TreeTopComponent());
 		setToolTipText(Bundle.HINT_TreeTopComponent());
 
+		graphComponent.setConnectable(false);
 		targetJGraphPanel.add(graphComponent, BorderLayout.CENTER);
 
 //		result = Utilities.actionsGlobalContext().lookupResult(DataObject.class);
@@ -145,11 +164,10 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		antlrTree.setShowsRootHandles(true);
 
 		layoutButton.removeAll();
+		layoutButton.add(new JMenuItem("Compact Tree Layout"));
 		layoutButton.add(new JMenuItem("Hierarchical Layout"));
-		layoutButton.add(new JMenuItem("Compact tree"));
 		layoutButton.add(new JMenuItem("Circle Layout"));
 		layoutButton.add(new JMenuItem("Organic Layout"));
-		layoutButton.add(new JMenuItem("Compact Tree Layout"));
 		layoutButton.add(new JMenuItem("Edge Label Layout"));
 		layoutButton.add(new JMenuItem("Fast Organic Layout"));
 		layoutButton.add(new JMenuItem("Orthogonal Layout"));
@@ -814,7 +832,6 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		} else {
 			str = ((JMenuItem) layoutButton.getEventSource()).getText();
 		}
-		layoutButton.setText(str);
 		if (str.equals("Hierarchical Layout")) {
 			mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
 			layout.execute(cell);
@@ -842,9 +859,6 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 			layout.execute(cell);
 		} else if (str.equals("Stack Layout")) {
 			mxStackLayout layout = new mxStackLayout(graph);
-			layout.execute(cell);
-		} else if (str.equals("Compact tree")) {
-			mxCompactTreeLayout layout = new mxCompactTreeLayout(graph);
 			layout.execute(cell);
 		} else {
 			System.out.println("no this layout");
@@ -978,10 +992,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	}
 
 	private void buildJGraph(AstNode root) {
+		graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
 		buildJGraphNode(root, null);
 		graph.setCellsDisconnectable(false);
-		graph.setAllowDanglingEdges(false);
-		graph.removeCells();
 		graph.getModel().beginUpdate();
 		mxMorphing morph = new mxMorphing(graphComponent, 20, 1.2, 20);
 		morph.addListener(mxEvent.DONE, new mxEventSource.mxIEventListener() {
@@ -994,9 +1007,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 	}
 
 	private void buildJGraphNode(AstNode node, mxCell mxNode) {
-		mxCell newNode = (mxCell) graph.insertVertex(null, node.getLabel(), node.getLabel(), 40, 40, 150, 30);
+		mxCell newNode = (mxCell) graph.insertVertex(null, null, node, 40, 40, 150, 30);
 		if (mxNode != null) {
-			graph.insertEdge(null, mxNode + " > " + newNode, "", mxNode, newNode, mxConstants.STYLE_STROKECOLOR + "=#000000;edgeStyle=elbowEdgeStyle;");
+			graph.insertEdge(null, null, "", mxNode, newNode, mxConstants.STYLE_STROKECOLOR + "=#000000;edgeStyle=elbowEdgeStyle;");
 		}
 
 		for (AstNode nn : node.getChildren()) {
