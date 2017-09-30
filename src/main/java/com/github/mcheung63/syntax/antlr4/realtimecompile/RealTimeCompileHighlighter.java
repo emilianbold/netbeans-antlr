@@ -1,4 +1,4 @@
-package com.github.mcheung63.syntax.antlr4;
+package com.github.mcheung63.syntax.antlr4.realtimecompile;
 
 import java.awt.Color;
 import javax.swing.text.AttributeSet;

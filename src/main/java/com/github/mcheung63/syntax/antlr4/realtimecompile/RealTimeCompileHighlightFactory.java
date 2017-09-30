@@ -1,4 +1,4 @@
-package com.github.mcheung63.syntax.antlr4;
+package com.github.mcheung63.syntax.antlr4.realtimecompile;
 
 import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeRegistration;

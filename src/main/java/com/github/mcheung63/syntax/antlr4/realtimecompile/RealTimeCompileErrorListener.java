@@ -1,6 +1,7 @@
-package com.github.mcheung63.syntax.antlr4.errorhighlight;
+package com.github.mcheung63.syntax.antlr4.realtimecompile;
 
 import com.github.mcheung63.ModuleLib;
+import com.github.mcheung63.syntax.antlr4.errorhighlight.ErrorInfo;
 import java.util.ArrayList;
 import java.util.BitSet;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -22,7 +23,7 @@ public class RealTimeCompileErrorListener extends BaseErrorListener {
 	DataObject dataObject;
 	ArrayList<ErrorInfo> targetErrorInfos;
 
-	RealTimeCompileErrorListener(DataObject targetDataObject, ArrayList<ErrorInfo> targetErrorInfos) {
+	public RealTimeCompileErrorListener(DataObject targetDataObject, ArrayList<ErrorInfo> targetErrorInfos) {
 		dataObject = targetDataObject;
 		this.targetErrorInfos = targetErrorInfos;
 	}

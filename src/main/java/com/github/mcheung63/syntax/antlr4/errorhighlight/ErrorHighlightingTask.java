@@ -1,16 +1,16 @@
 package com.github.mcheung63.syntax.antlr4.errorhighlight;
 
+import com.github.mcheung63.syntax.antlr4.realtimecompile.RealTimeCompileErrorListener;
 import com.github.mcheung63.FileTypeG4VisualElement;
 import com.github.mcheung63.ModuleLib;
 import com.github.mcheung63.syntax.antlr4.ChooseRealTimecompileFilePanel;
-import com.github.mcheung63.syntax.antlr4.RealTimeCompileHighlighter;
+import com.github.mcheung63.syntax.antlr4.realtimecompile.RealTimeCompileHighlighter;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.antlr.v4.Tool;
@@ -20,7 +20,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -31,7 +30,6 @@ import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
-import org.netbeans.spi.editor.highlighting.HighlightsLayerFactory;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
@@ -41,8 +39,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
-import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 
 /**
