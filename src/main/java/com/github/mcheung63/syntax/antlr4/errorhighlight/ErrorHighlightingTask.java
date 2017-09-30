@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.StyleConstants;
 import org.antlr.v4.Tool;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -25,11 +26,16 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.netbeans.api.editor.EditorRegistry;
 import org.antlr.v4.tool.ast.GrammarRootAST;
+import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.modules.editor.NbEditorUtilities;
+import org.netbeans.modules.editor.lib2.highlighting.ProxyHighlightsContainer;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
+import org.netbeans.spi.editor.highlighting.HighlightsContainer;
+import org.netbeans.spi.editor.highlighting.HighlightsSequence;
+import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
@@ -97,11 +103,11 @@ public class ErrorHighlightingTask extends ParserResultTask {
 
 	private void realTimeCompile() {
 		try {
-			JTextComponent jTextComponent = EditorRegistry.lastFocusedComponent();
-			if (jTextComponent == null) {
+			JTextComponent currentTextComponent = EditorRegistry.lastFocusedComponent();
+			if (currentTextComponent == null) {
 				return;
 			}
-			Document doc = jTextComponent.getDocument();
+			Document doc = currentTextComponent.getDocument();
 			DataObject dataObject = NbEditorUtilities.getDataObject(doc);
 			File targetFile = FileTypeG4VisualElement.maps.get(dataObject);
 			if (targetFile == null) {
@@ -118,7 +124,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 			}
 
 			Tool tool = new Tool();
-			GrammarRootAST ast = tool.parseGrammarFromString(jTextComponent.getText());
+			GrammarRootAST ast = tool.parseGrammarFromString(currentTextComponent.getText());
 			if (ast.grammarType == ANTLRParser.COMBINED) {
 				Grammar grammar = tool.createGrammar(ast);
 				tool.process(grammar, false);
@@ -145,19 +151,28 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				}
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
 
-				RealTimeCompileHighlighter realTimeCompileHighlight = (RealTimeCompileHighlighter) targetDoc.getProperty(RealTimeCompileHighlighter.class);
-				realTimeCompileHighlight.bag.clear();
-				for (ErrorInfo errorInfo : ErrorHighlightingTask.targetErrorInfos) {
-					realTimeCompileHighlight.bag.addHighlight(errorInfo.offsetStart, errorInfo.offsetEnd, realTimeCompileHighlight.defaultColors);
-				}
+				RealTimeCompileHighlighter realTimeCompileHighlighter = (RealTimeCompileHighlighter) targetDoc.getProperty(RealTimeCompileHighlighter.class);
+				if (realTimeCompileHighlighter != null) {
+					realTimeCompileHighlighter.bag.clear();
+					for (ErrorInfo errorInfo : ErrorHighlightingTask.targetErrorInfos) {
+						realTimeCompileHighlighter.bag.addHighlight(errorInfo.offsetStart, errorInfo.offsetEnd, realTimeCompileHighlighter.defaultColors);
+					}
 
-				TopComponent topComponent = TopComponent.getRegistry().getActivated();
-				ChooseRealTimecompileFilePanel chooseRealTimecompileFilePanel = (ChooseRealTimecompileFilePanel) ModuleLib.getJComponent(topComponent, ChooseRealTimecompileFilePanel.class, "\t");
-				if (chooseRealTimecompileFilePanel != null) {
-					if (targetErrorListener.compilerError) {
-						chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.red);
-					} else {
-						chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.green);
+					OffsetsBag bag = new OffsetsBag(doc);
+					bag.addHighlight(5, 10, AttributesUtilities.createImmutable(StyleConstants.Background, Color.cyan));
+					HighlightsContainer[] layers = new HighlightsContainer[]{bag};
+					ProxyHighlightsContainer hb = new ProxyHighlightsContainer(doc, layers);
+//				HighlightsSequence hs = hb.getHighlights(0, Integer.MAX_VALUE);
+					hb.setLayers(doc, layers);
+
+					TopComponent topComponent = TopComponent.getRegistry().getActivated();
+					ChooseRealTimecompileFilePanel chooseRealTimecompileFilePanel = (ChooseRealTimecompileFilePanel) ModuleLib.getJComponent(topComponent, ChooseRealTimecompileFilePanel.class, "\t");
+					if (chooseRealTimecompileFilePanel != null) {
+						if (targetErrorListener.compilerError) {
+							chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.red);
+						} else {
+							chooseRealTimecompileFilePanel.compileStatusLabel.setBackground(Color.green);
+						}
 					}
 				}
 			}

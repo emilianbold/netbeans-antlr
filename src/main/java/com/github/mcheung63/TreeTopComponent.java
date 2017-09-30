@@ -148,6 +148,7 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
 		}
 	};
 	MyGraphComponent graphComponent = new MyGraphComponent(graph);
+	TargetTableModel targetTableModel=new TargetTableModel();
 
 	public TreeTopComponent() {
 		initComponents();
@@ -182,6 +183,9 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private void initComponents() {
 
         mainTabbedPane = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         targetJGraphPanel = new javax.swing.JPanel();
         jToolBar4 = new javax.swing.JToolBar();
         refreshTargetJgraphButton = new javax.swing.JButton();
@@ -219,6 +223,15 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
         searchAntlrTreeTextField = new com.peterswing.advancedswing.searchtextfield.JSearchTextField();
 
         setLayout(new java.awt.BorderLayout());
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jTable1.setModel(targetTableModel);
+        jScrollPane2.setViewportView(jTable1);
+
+        jPanel1.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        mainTabbedPane.addTab(org.openide.util.NbBundle.getMessage(TreeTopComponent.class, "TreeTopComponent.jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
 
         targetJGraphPanel.setLayout(new java.awt.BorderLayout());
 
@@ -940,7 +953,10 @@ public final class TreeTopComponent extends TopComponent /*implements LookupList
     private javax.swing.JScrollPane graphvizScrollPane;
     private javax.swing.JScrollPane graphvizScrollPane1;
     private javax.swing.JLabel graphvizTargetGraphLabel;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
     private javax.swing.JToolBar jToolBar3;
