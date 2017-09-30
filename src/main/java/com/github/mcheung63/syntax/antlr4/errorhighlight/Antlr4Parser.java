@@ -44,8 +44,8 @@ public class Antlr4Parser extends Parser {
 				Token offendingToken = (Token) offendingSymbol;
 				int start = offendingToken.getStartIndex() + snapshot.getOriginalOffset(0);
 				int stop = offendingToken.getStopIndex() + snapshot.getOriginalOffset(0);
-				ModuleLib.log("syntaxError " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + start + ", " + stop + ", " + message + ", " + re);
-				ModuleLib.log("\t\t " + rcgnzr + ", " + offendingToken.getStartIndex() + ", " + offendingToken.getStopIndex());
+				//ModuleLib.log("syntaxError " + rcgnzr + ", " + lineNumber + ", " + charOffsetFromLine + ", " + start + ", " + stop + ", " + message + ", " + re);
+				//ModuleLib.log("\t\t " + rcgnzr + ", " + offendingToken.getStartIndex() + ", " + offendingToken.getStopIndex());
 
 				ErrorHighlightingTask.errorInfos.add(new ErrorInfo(start, stop, message));
 			}

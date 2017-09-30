@@ -128,7 +128,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				tool.process(grammar, false);
 
 				targetErrorInfos.clear();
-				MyBaseErrorListener targetErrorListener = new MyBaseErrorListener(targetDataObject, targetErrorInfos);
+				RealTimeCompileErrorListener targetErrorListener = new RealTimeCompileErrorListener(targetDataObject, targetErrorInfos);
 				LexerInterpreter lexer = grammar.createLexerInterpreter(new ANTLRInputStream(new FileInputStream(targetFile)));
 				lexer.removeErrorListeners();
 				lexer.addErrorListener(targetErrorListener);
@@ -150,6 +150,7 @@ public class ErrorHighlightingTask extends ParserResultTask {
 				ParserRuleContext parserRuleContext = parser.parse(start.index);
 
 				RealTimeCompileHighlighter realTimeCompileHighlight = (RealTimeCompileHighlighter) targetDoc.getProperty(RealTimeCompileHighlighter.class);
+				realTimeCompileHighlight.bag.clear();
 				for (ErrorInfo errorInfo : ErrorHighlightingTask.targetErrorInfos) {
 					realTimeCompileHighlight.bag.addHighlight(errorInfo.offsetStart, errorInfo.offsetEnd, realTimeCompileHighlight.defaultColors);
 				}

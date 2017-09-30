@@ -14,16 +14,10 @@ import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 public class RealTimeCompileHighlighter {
 
 	public OffsetsBag bag;
-	public static final AttributeSet defaultColors = AttributesUtilities.createImmutable(StyleConstants.Background, Color.green);
+	public static final AttributeSet defaultColors = AttributesUtilities.createImmutable(StyleConstants.Background, Color.pink);
 
 	public RealTimeCompileHighlighter(Document doc) {
 		bag = new OffsetsBag(doc);
-		//DataObject dataObject = NbEditorUtilities.getDataObject(doc);
-		//ModuleLib.log("test = " + (dataObject == ErrorHighlightingTask.targetDataObject));
-		//if (dataObject == ErrorHighlightingTask.targetDataObject) {
-
-		//}
-		//bag.addHighlight(1, 5, defaultColors);
 	}
 
 	public OffsetsBag getHighlightsBag() {
